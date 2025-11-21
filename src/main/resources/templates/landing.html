@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Rental Service - Home</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-blue: #0b3d91;
+            --accent-orange: #ff7b00;
+            --text-dark: #333;
+            --text-light: #fff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(rgba(0,0,0,0.4), rgba(0,0,0,0.5)),
+            url('https://images.unsplash.com/photo-1503376780353-7e6692767b70') center/cover no-repeat;
+            height: 100vh;
+            margin: 0;
+            color: var(--text-light);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: rgba(11, 61, 145, 0.9);
+            padding: 0.8rem 2rem;
+        }
+
+        .navbar-brand {
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+        }
+
+        .navbar-brand i {
+            margin-right: 8px;
+            color: var(--accent-orange);
+        }
+
+        .nav-link {
+            color: var(--text-light) !important;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-orange) !important;
+        }
+
+        .landing-content {
+            text-align: center;
+            margin: auto;
+            max-width: 700px;
+        }
+
+        .landing-content h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .landing-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #f0f0f0;
+        }
+
+        .btn-custom {
+            background-color: var(--accent-orange);
+            border: none;
+            padding: 0.7rem 1.5rem;
+            border-radius: 30px;
+            color: #fff;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .btn-custom:hover {
+            background-color: #ff6500;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            color: #ccc;
+            font-size: 0.9rem;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="#">
+        <i class="fa fa-car-side"></i>DriveEase Rentals
+    </a>
+    <div class="ml-auto">
+        <a class="nav-link d-inline" th:href="@{/login}"><i class="fa fa-sign-in-alt"></i> Login</a>
+        <a class="nav-link d-inline" th:href="@{/register}"><i class="fa fa-user-plus"></i> Register</a>
+    </div>
+</nav>
+
+<!-- Landing Section -->
+<div class="landing-content">
+    <h1>Welcome to DriveEase Rentals</h1>
+    <p>Your trusted platform for convenient, affordable, and secure vehicle rentals.</p>
+</div>
+
+<!-- Footer -->
+<footer>
+    &copy; 2025 DriveEase Rentals. All Rights Reserved.
+</footer>
+
+</body>
+</html>
