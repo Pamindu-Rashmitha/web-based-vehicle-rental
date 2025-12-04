@@ -15,9 +15,12 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SecurityConfig {
     private final UserRepository userRepository;
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
 
-    public SecurityConfig(UserRepository userRepository) {
+    public SecurityConfig(UserRepository userRepository,
+            CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
         this.userRepository = userRepository;
+        this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
     }
 
     @Bean
@@ -35,19 +38,18 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/register", "/login", "/privacy", "/css/**", "/js/**").permitAll()
-                        .anyRequest().authenticated()
-                )
+                        .requestMatchers("/", "/register", "/login", "/privacy", "/css/**", "/js/**", "/images/**")
+                        .permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .anyRequest().authenticated())
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/profile", true)
-                        .permitAll()
-                )
+                        .successHandler(customAuthenticationSuccessHandler)
+                        .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
-                        .permitAll()
-                );
+                        .permitAll());
         return http.build();
     }
 }
