@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Rentals - DriveEase Rentals</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0b3d91;
+            --accent-orange: #ff7b00;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .navbar {
+            background-color: var(--primary-blue);
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .rentals-container {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+        }
+        .vehicle-thumb {
+            width: 90px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .nav-tabs .nav-link {
+            color: #555;
+            font-weight: 500;
+        }
+        .nav-tabs .nav-link.active {
+            color: var(--primary-blue);
+            font-weight: bold;
+            border-bottom: 4px solid var(--primary-blue);
+        }
+        .badge-completed { background-color: #28a745; }
+        .badge-cancelled { background-color: #dc3545; }
+        .text-strike { text-decoration: line-through; color: #999; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="/"><i class="fa fa-car-side"></i> DriveEase</a>
+    <div class="ml-auto">
+        <a href="/browse" class="btn btn-outline-light btn-sm mr-2">Browse Vehicles</a>
+        <a href="/profile" class="btn btn-outline-light btn-sm mr-2">My Profile</a>
+        <form th:action="@{/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-light btn-sm">Logout</button>
+        </form>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="rentals-container">
+        <h2 class="mb-4 text-center text-primary"><i class="fa fa-tachometer-alt mr-2"></i>My Rentals Dashboard</h2>
+
+        <ul class="nav nav-tabs mb-5 justify-content-center" id="rentalTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="upcoming-tab" data-toggle="tab" href="#upcoming">Upcoming</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="active-tab" data-toggle="tab" href="#active">Ongoing</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="past-tab" data-toggle="tab" href="#past">Past</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <!-- Upcoming -->
+            <div class="tab-pane fade show active" id="upcoming">
+                <div th:if="${error}" class="alert alert-danger text-center" th:text="${error}"></div>
+                <div th:if="${upcomingReservations == null or upcomingReservations.isEmpty()}" class="text-center py-5">
+                    <h4>No upcoming rentals</h4>
+                    <p>Time to hit the road!</p>
+                </div>
+                <div th:unless="${upcomingReservations == null or upcomingReservations.isEmpty()}" class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Dates</th>
+                                <th>Total Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r : ${upcomingReservations}" th:with="vehicle=${r.vehicle}, startDate=${r.startDate}, endDate=${r.endDate}">
+                                <td th:replace="~{::vehicleCell}"></td>
+                                <td th:replace="~{::dateCell}"></td>
+                                <td class="font-weight-bold text-success" th:text="'$' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
+                                <td>
+                                    <button class="btn btn-danger btn-sm" th:onclick="'cancelReservation(' + ${r.id} + ')'">
+                                        Cancel
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Active / Ongoing -->
+            <div class="tab-pane fade" id="active">
+                <div th:if="${activeReservations == null or activeReservations.isEmpty()}" class="text-center py-5">
+                    <h4>No active rentals</h4>
+                    <p>Enjoy your current trip when you book!</p>
+                </div>
+                <div th:unless="${activeReservations == null or activeReservations.isEmpty()}" class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Dates</th>
+                                <th>Total Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r : ${activeReservations}" th:with="vehicle=${r.vehicle}, startDate=${r.startDate}, endDate=${r.endDate}">
+                                <td th:replace="~{::vehicleCell}"></td>
+                                <td th:replace="~{::dateCell}"></td>
+                                <td class="font-weight-bold text-success" th:text="'$' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
+                                <td>
+                                    <button class="btn btn-primary btn-sm" th:onclick="'openExtendModal(' + ${r.id} + ')'">
+                                        Extend
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Past -->
+            <div class="tab-pane fade" id="past">
+                <div th:if="${pastReservations == null or pastReservations.isEmpty()}" class="text-center py-5">
+                    <h4>No past rentals yet</h4>
+                    <p>Your journey starts here!</p>
+                </div>
+                <div th:unless="${pastReservations == null or pastReservations.isEmpty()}" class="table-responsive">
+                    <table class="table table-hover align-middle">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Vehicle</th>
+                                <th>Dates</th>
+                                <th>Total Price</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="r : ${pastReservations}" th:with="vehicle=${r.vehicle}, startDate=${r.startDate}, endDate=${r.endDate}">
+                                <td th:replace="~{::vehicleCell}"></td>
+                                <td th:replace="~{::dateCell}"></td>
+                                <td class="font-weight-bold text-success" th:text="'$' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
+                                <td>
+                                    <span th:class="'badge ' + (${r.status == 'COMPLETED'} ? 'badge-success' : 'badge-secondary')"
+                                          th:text="${r.status}">Status</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="/browse" class="btn btn-success btn-lg px-5">
+                <i class="fa fa-car mr-2"></i> Book Another Vehicle
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- NULL-SAFE FRAGMENTS (NO parameters passed!) -->
+<table style="display: none;">
+    <!-- Vehicle Cell Fragment -->
+    <!-- Vehicle Cell Fragment -->
+    <td th:fragment="vehicleCell">
+        <div class="d-flex align-items-center">
+            <img th:src="${vehicle?.imageUrl} ?: 'https://via.placeholder.com/90x60?text=No+Image'"
+                 class="vehicle-thumb mr-3"
+                 alt="Vehicle"
+                 onerror="this.src='https://via.placeholder.com/90x60?text=No+Image'">
+            <div>
+                <h6 class="mb-0"
+                    th:text="${vehicle != null ? vehicle.brand + ' ' + vehicle.model : 'Vehicle No Longer Available'}">
+                    Unknown Vehicle
+                </h6>
+                <small class="text-muted"
+                       th:text="${vehicle?.type} ?: 'Unknown Type'">
+                    SUV
+                </small>
+            </div>
+        </div>
+    </td>
+
+    <!-- Date Cell Fragment -->
+    <td th:fragment="dateCell">
+        <div>
+            <strong th:text="${#temporals.format(startDate, 'MMM dd, yyyy')}">Start</strong>
+            <span class="text-muted mx-1">→</span>
+            <strong th:text="${#temporals.format(endDate, 'MMM dd, yyyy')}">End</strong>
+        </div>
+        <small class="text-muted d-block"
+               th:if="${startDate != null and endDate != null}"
+               th:text="${T(java.time.temporal.ChronoUnit).DAYS.between(startDate, endDate) + 1} + ' days total'">
+            0 days
+        </small>
+    </td>
+</table>
+
+<!-- Extend Modal -->
+<div class="modal fade" id="extendModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Extend Your Rental</h5>
+                <button type="button" class="close text-white" data-dismiss="modal">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="extendForm">
+                    <input type="hidden" id="extendReservationId">
+                    <div class="form-group">
+                        <label for="extraDays"><strong>How many extra days?</strong></label>
+                        <input type="number" class="form-control form-control-lg text-center"
+                               id="extraDays" min="1" max="30" value="3" required>
+                        <small class="text-muted">Maximum 30 days</small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary btn-lg" onclick="submitExtend()">
+                    Extend Reservation
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script th:inline="javascript">
+    const csrfToken = /*[[${_csrf?.token}]]*/ null;
+
+    function cancelReservation(id) {
+        if (confirm('Are you sure you want to cancel this reservation?\nThis action cannot be undone.')) {
+            fetch(`/api/reservations/${id}/cancel`, {
+                method: 'POST',
+                headers: { 'X-CSRF-TOKEN': csrfToken }
+            })
+            .then(r => r.ok ? location.reload() : r.text().then(alert))
+            .catch(() => alert('Network error. Try again.'));
+        }
+    }
+
+    function openExtendModal(id) {
+        document.getElementById('extendReservationId').value = id;
+        $('#extendModal').modal('show');
+    }
+
+    function submitExtend() {
+        const id = document.getElementById('extendReservationId').value;
+        const days = parseInt(document.getElementById('extraDays').value);
+
+        if (!days || days < 1) return alert('Please enter valid days');
+
+        fetch(`/api/reservations/${id}/extend`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ extraDays: days })
+        })
+        .then(r => r.ok ? (alert('Rental extended successfully!'), location.reload()) : r.text().then(alert))
+        .catch(() => alert('Failed to extend. Please try again.'));
+    }
+</script>
+
+</body>
+</html>

@@ -56,4 +56,28 @@ public class ReservationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @PostMapping("/{id}/cancel")
+    public ResponseEntity<?> cancelReservation(@PathVariable Long id) {
+        try {
+            reservationService.cancelReservation(id);
+            return ResponseEntity.ok("Reservation cancelled successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/extend")
+    public ResponseEntity<?> extendReservation(@PathVariable Long id, @RequestBody Map<String, Integer> payload) {
+        try {
+            Integer extraDays = payload.get("extraDays");
+            if (extraDays == null || extraDays <= 0) {
+                return ResponseEntity.badRequest().body("Invalid extra days");
+            }
+            reservationService.extendReservation(id, extraDays);
+            return ResponseEntity.ok("Reservation extended successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

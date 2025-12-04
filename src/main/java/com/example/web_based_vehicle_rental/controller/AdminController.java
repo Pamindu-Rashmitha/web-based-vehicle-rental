@@ -125,4 +125,28 @@ public class AdminController {
                     .body("Cannot delete vehicle. It may have associated reservations.");
         }
     }
+
+    // Reports Endpoints
+
+    @GetMapping("/reports/income")
+    public ResponseEntity<List<Object[]>> getMonthlyIncome() {
+        return ResponseEntity.ok(adminService.getMonthlyIncome());
+    }
+
+    @GetMapping("/reports/popularity")
+    public ResponseEntity<List<Object[]>> getMostPopularVehicles() {
+        return ResponseEntity.ok(adminService.getMostPopularVehicles());
+    }
+
+    @GetMapping("/reports/overdue")
+    public ResponseEntity<List<com.example.web_based_vehicle_rental.model.Reservation>> getOverdueReservations() {
+        return ResponseEntity.ok(adminService.getOverdueReservations());
+    }
+
+    // Reservation Management Endpoints
+
+    @GetMapping("/reservations")
+    public ResponseEntity<List<com.example.web_based_vehicle_rental.model.Reservation>> getAllReservations() {
+        return ResponseEntity.ok(adminService.getAllReservations());
+    }
 }

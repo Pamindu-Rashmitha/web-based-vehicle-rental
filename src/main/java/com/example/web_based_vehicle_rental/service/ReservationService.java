@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ReservationService {
@@ -71,5 +72,57 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.CONFIRMED); // Auto-confirm for now
 
         return reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public void cancelReservation(Long reservationId) {
+        if (reservationId == null) {
+            throw new IllegalArgumentException("Reservation ID cannot be null");
+        }
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+
+        if (reservation.getStartDate().isBefore(LocalDate.now())) {
+            throw new IllegalStateException("Cannot cancel past or active reservations");
+        }
+
+        reservation.setStatus(ReservationStatus.CANCELLED);
+        reservationRepository.save(reservation);
+    }
+
+    @Transactional
+    public void extendReservation(Long reservationId, int extraDays) {
+        if (reservationId == null) {
+            throw new IllegalArgumentException("Reservation ID cannot be null");
+        }
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+
+        if (reservation.getStatus() != ReservationStatus.CONFIRMED) {
+            throw new IllegalStateException("Only confirmed reservations can be extended");
+        }
+
+        LocalDate currentEndDate = reservation.getEndDate();
+        LocalDate newEndDate = currentEndDate.plusDays(extraDays);
+
+        // Check availability for the extension period (start of extension is day after
+        // current end date)
+        LocalDate extensionStartDate = currentEndDate.plusDays(1);
+
+        List<Vehicle> availableVehicles = vehicleRepository.findAvailableVehicles(extensionStartDate, newEndDate);
+        boolean isAvailable = availableVehicles.stream()
+                .anyMatch(v -> Objects.equals(v.getId(), reservation.getVehicle().getId()));
+
+        if (!isAvailable) {
+            throw new IllegalStateException("Vehicle is not available for the requested extension period");
+        }
+
+        reservation.setEndDate(newEndDate);
+
+        // Recalculate price
+        long totalDays = ChronoUnit.DAYS.between(reservation.getStartDate(), newEndDate) + 1;
+        reservation.setTotalPrice(reservation.getVehicle().getDailyPrice() * totalDays);
+
+        reservationRepository.save(reservation);
     }
 }

@@ -87,6 +87,8 @@
             <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                 <a class="nav-link active" id="v-pills-users-tab" data-toggle="pill" href="#v-pills-users" role="tab" aria-controls="v-pills-users" aria-selected="true"><i class="fa fa-users mr-2"></i> Users</a>
                 <a class="nav-link" id="v-pills-vehicles-tab" data-toggle="pill" href="#v-pills-vehicles" role="tab" aria-controls="v-pills-vehicles" aria-selected="false"><i class="fa fa-car mr-2"></i> Vehicles</a>
+                <a class="nav-link" id="v-pills-reservations-tab" data-toggle="pill" href="#v-pills-reservations" role="tab" aria-controls="v-pills-reservations" aria-selected="false"><i class="fa fa-calendar-alt mr-2"></i> Reservations</a>
+                <a class="nav-link" id="v-pills-reports-tab" data-toggle="pill" href="#v-pills-reports" role="tab" aria-controls="v-pills-reports" aria-selected="false"><i class="fa fa-chart-line mr-2"></i> Reports</a>
             </div>
         </div>
         <div class="col-md-10 content-area">
@@ -148,6 +150,80 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Reservations Section -->
+                <div class="tab-pane fade" id="v-pills-reservations" role="tabpanel" aria-labelledby="v-pills-reservations-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>Reservation Management</h3>
+                        <button class="btn btn-sm btn-primary" onclick="fetchReservations()"><i class="fa fa-sync"></i> Refresh</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>User</th>
+                                        <th>Vehicle</th>
+                                        <th>Dates</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reservationsTableBody">
+                                    <!-- Reservations will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reports Section -->
+                <div class="tab-pane fade" id="v-pills-reports" role="tabpanel" aria-labelledby="v-pills-reports-tab">
+                    <h3 class="mb-4">Reports & Analytics</h3>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-white font-weight-bold">Monthly Income</div>
+                                <div class="card-body">
+                                    <canvas id="incomeChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-white font-weight-bold">Most Popular Vehicles</div>
+                                <div class="card-body">
+                                    <canvas id="popularityChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header bg-danger text-white font-weight-bold">
+                            <i class="fa fa-exclamation-triangle mr-2"></i> Overdue Alerts
+                        </div>
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Reservation ID</th>
+                                        <th>User</th>
+                                        <th>Vehicle</th>
+                                        <th>End Date</th>
+                                        <th>Total Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="overdueTableBody">
+                                    <!-- Overdue items loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -224,6 +300,7 @@
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
     const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
@@ -237,6 +314,15 @@
     $(document).ready(function() {
         fetchUsers();
         fetchVehicles();
+        
+        // Load reports when tab is shown
+        $('a[data-toggle="pill"]').on('shown.bs.tab', function (e) {
+            if (e.target.id === 'v-pills-reports-tab') {
+                loadReports();
+            } else if (e.target.id === 'v-pills-reservations-tab') {
+                fetchReservations();
+            }
+        });
     });
 
     // --- User Management ---
@@ -381,6 +467,123 @@
                 }
             });
         }
+    }
+
+    // --- Reservation Management ---
+
+    function fetchReservations() {
+        fetch('/admin/reservations')
+            .then(response => response.json())
+            .then(reservations => {
+                const tbody = document.getElementById('reservationsTableBody');
+                tbody.innerHTML = '';
+                reservations.forEach(r => {
+                    let statusBadge = 'secondary';
+                    if (r.status === 'CONFIRMED') statusBadge = 'success';
+                    else if (r.status === 'PENDING') statusBadge = 'warning';
+                    else if (r.status === 'CANCELLED') statusBadge = 'danger';
+                    else if (r.status === 'COMPLETED') statusBadge = 'info';
+
+                    const row = `
+                        <tr>
+                            <td>${r.id}</td>
+                            <td>${r.user.username}</td>
+                            <td>${r.vehicle.brand} ${r.vehicle.model}</td>
+                            <td>${r.startDate} to ${r.endDate}</td>
+                            <td>$${r.totalPrice}</td>
+                            <td><span class="badge badge-${statusBadge}">${r.status}</span></td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    // --- Reports ---
+    let incomeChart = null;
+    let popularityChart = null;
+
+    function loadReports() {
+        loadIncomeChart();
+        loadPopularityChart();
+        loadOverdueTable();
+    }
+
+    function loadIncomeChart() {
+        fetch('/admin/reports/income')
+            .then(res => res.json())
+            .then(data => {
+                const labels = data.map(item => `${item[0]}-${item[1]}`); // Year-Month
+                const values = data.map(item => item[2]); // Total
+
+                const ctx = document.getElementById('incomeChart').getContext('2d');
+                if (incomeChart) incomeChart.destroy();
+                
+                incomeChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Revenue ($)',
+                            data: values,
+                            backgroundColor: 'rgba(11, 61, 145, 0.7)',
+                            borderColor: 'rgba(11, 61, 145, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: { scales: { y: { beginAtZero: true } } }
+                });
+            });
+    }
+
+    function loadPopularityChart() {
+        fetch('/admin/reports/popularity')
+            .then(res => res.json())
+            .then(data => {
+                const labels = data.map(item => `${item[0].brand} ${item[0].model}`);
+                const values = data.map(item => item[1]); // Count
+
+                const ctx = document.getElementById('popularityChart').getContext('2d');
+                if (popularityChart) popularityChart.destroy();
+
+                popularityChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: values,
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                            ]
+                        }]
+                    }
+                });
+            });
+    }
+
+    function loadOverdueTable() {
+        fetch('/admin/reports/overdue')
+            .then(res => res.json())
+            .then(reservations => {
+                const tbody = document.getElementById('overdueTableBody');
+                tbody.innerHTML = '';
+                if (reservations.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No overdue reservations.</td></tr>';
+                    return;
+                }
+                reservations.forEach(r => {
+                    const row = `
+                        <tr>
+                            <td>${r.id}</td>
+                            <td>${r.user.username}</td>
+                            <td>${r.vehicle.brand} ${r.vehicle.model}</td>
+                            <td class="text-danger font-weight-bold">${r.endDate}</td>
+                            <td>$${r.totalPrice}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            });
     }
 </script>
 

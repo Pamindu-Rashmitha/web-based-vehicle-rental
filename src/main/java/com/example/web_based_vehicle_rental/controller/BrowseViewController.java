@@ -24,7 +24,7 @@ public class BrowseViewController {
     }
 
     @GetMapping("/booking/confirm")
-    public String confirmBooking(@RequestParam Long vehicleId,
+    public String confirmBooking(@RequestParam long vehicleId,
             @RequestParam String startDate,
             @RequestParam String endDate,
             Model model) {

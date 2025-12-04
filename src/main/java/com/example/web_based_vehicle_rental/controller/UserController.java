@@ -113,11 +113,4 @@ public class UserController {
         userService.deleteAccount(username);
         return "redirect:/login";
     }
-
-    @GetMapping("/my-rentals")
-    public String showMyRentals(Model model) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        model.addAttribute("reservations", userService.getUserReservations(username));
-        return "my_rentals";
-    }
 }

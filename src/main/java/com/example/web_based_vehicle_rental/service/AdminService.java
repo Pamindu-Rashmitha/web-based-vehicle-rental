@@ -3,7 +3,13 @@ package com.example.web_based_vehicle_rental.service;
 import com.example.web_based_vehicle_rental.model.User;
 import com.example.web_based_vehicle_rental.model.Vehicle;
 import com.example.web_based_vehicle_rental.repository.UserRepository;
+
 import com.example.web_based_vehicle_rental.repository.VehicleRepository;
+import com.example.web_based_vehicle_rental.repository.ReservationRepository;
+import com.example.web_based_vehicle_rental.model.Reservation;
+import com.example.web_based_vehicle_rental.model.ReservationStatus;
+import java.time.LocalDate;
+import java.util.Arrays;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +20,13 @@ public class AdminService {
 
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
+    private final ReservationRepository reservationRepository;
 
-    public AdminService(UserRepository userRepository, VehicleRepository vehicleRepository) {
+    public AdminService(UserRepository userRepository, VehicleRepository vehicleRepository,
+            ReservationRepository reservationRepository) {
         this.userRepository = userRepository;
         this.vehicleRepository = vehicleRepository;
+        this.reservationRepository = reservationRepository;
     }
 
     // User Management
@@ -96,5 +105,24 @@ public class AdminService {
         if (id == null)
             throw new IllegalArgumentException("Vehicle ID cannot be null");
         return vehicleRepository.findById(id);
+    }
+
+    // Reports
+    public List<Object[]> getMonthlyIncome() {
+        return reservationRepository.findIncomeByMonth();
+    }
+
+    public List<Object[]> getMostPopularVehicles() {
+        return reservationRepository.findMostPopularVehicles();
+    }
+
+    public List<Reservation> getOverdueReservations() {
+        return reservationRepository.findOverdueReservations(
+                LocalDate.now(),
+                Arrays.asList(ReservationStatus.COMPLETED, ReservationStatus.CANCELLED));
+    }
+
+    public List<Reservation> getAllReservations() {
+        return reservationRepository.findAll();
     }
 }
