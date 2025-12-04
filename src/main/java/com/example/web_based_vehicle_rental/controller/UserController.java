@@ -84,7 +84,8 @@ public class UserController {
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         try {
             String newUsername = updatedUser.getUsername() != null && !updatedUser.getUsername().isEmpty()
-                    ? updatedUser.getUsername() : currentUsername;
+                    ? updatedUser.getUsername()
+                    : currentUsername;
 
             userService.updateProfile(currentUsername, updatedUser);
 
@@ -94,8 +95,7 @@ public class UserController {
                 Authentication newAuth = new UsernamePasswordAuthenticationToken(
                         updatedUserFromDb,
                         null,
-                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + updatedUserFromDb.getRole()))
-                );
+                        Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + updatedUserFromDb.getRole())));
                 SecurityContextHolder.getContext().setAuthentication(newAuth);
             }
 
@@ -112,5 +112,12 @@ public class UserController {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         userService.deleteAccount(username);
         return "redirect:/login";
+    }
+
+    @GetMapping("/my-rentals")
+    public String showMyRentals(Model model) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        model.addAttribute("reservations", userService.getUserReservations(username));
+        return "my_rentals";
     }
 }

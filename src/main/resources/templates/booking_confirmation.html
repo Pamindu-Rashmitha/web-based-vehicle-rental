@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirm Booking - DriveEase Rentals</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0b3d91;
+            --accent-orange: #ff7b00;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .navbar {
+            background-color: var(--primary-blue);
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .confirmation-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+        .vehicle-header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 1.5rem;
+        }
+        .vehicle-img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        .price-summary {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+        }
+        .total-price {
+            color: var(--accent-orange);
+            font-size: 2rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="/"><i class="fa fa-car-side"></i> DriveEase</a>
+</nav>
+
+<div class="container mb-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="confirmation-card">
+                <div class="vehicle-header">
+                    <h2 class="mb-0">Confirm Your Booking</h2>
+                </div>
+                <img th:src="${vehicle.imageUrl != null ? vehicle.imageUrl : 'https://via.placeholder.com/800x400?text=No+Image'}" class="vehicle-img" alt="Vehicle Image">
+                
+                <div class="p-4">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <h3 th:text="${vehicle.brand + ' ' + vehicle.model}">Car Model</h3>
+                            <p class="text-muted" th:text="${vehicle.type} + ' | ' + ${vehicle.year}">Type | Year</p>
+                            <hr>
+                            <h5>Booking Details</h5>
+                            <div class="row mt-3">
+                                <div class="col-6">
+                                    <small class="text-muted">Pick-up</small>
+                                    <p class="font-weight-bold" th:text="${startDate}">Start Date</p>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">Return</small>
+                                    <p class="font-weight-bold" th:text="${endDate}">End Date</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="price-summary text-center h-100 d-flex flex-column justify-content-center">
+                                <small class="text-muted">Total Price for <span th:text="${days}">0</span> days</small>
+                                <div class="total-price" th:text="'$' + ${totalPrice}">$0.00</div>
+                                <p class="mb-0 text-muted" th:text="'($' + ${vehicle.dailyPrice} + '/day)'">($0/day)</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="/browse" class="btn btn-outline-secondary">Cancel</a>
+                        <button onclick="confirmBooking()" class="btn btn-success btn-lg px-5">Confirm Booking</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CSRF Token -->
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+<!-- Hidden inputs for JS -->
+<input type="hidden" id="vehicleId" th:value="${vehicle.id}">
+<input type="hidden" id="startDate" th:value="${startDate}">
+<input type="hidden" id="endDate" th:value="${endDate}">
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+    function confirmBooking() {
+        const vehicleId = document.getElementById('vehicleId').value;
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+
+        fetch('/api/reservations/book', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify({
+                vehicleId: vehicleId,
+                startDate: startDate,
+                endDate: endDate
+            })
+        }).then(response => {
+            if (response.ok) {
+                alert('Booking Confirmed! Redirecting to your rentals...');
+                window.location.href = '/my-rentals'; // Assuming this page exists or will exist
+            } else if (response.status === 403) {
+                alert('Please login to complete your booking.');
+                window.location.href = '/login';
+            } else {
+                response.text().then(text => alert('Booking failed: ' + text));
+            }
+        });
+    }
+</script>
+
+</body>
+</html>

@@ -82,6 +82,9 @@ public class AdminService {
     public void deleteVehicle(Long id) {
         if (id == null)
             throw new IllegalArgumentException("Vehicle ID cannot be null");
+        if (!vehicleRepository.existsById(id)) {
+            throw new IllegalArgumentException("Vehicle not found with ID: " + id);
+        }
         vehicleRepository.deleteById(id);
     }
 

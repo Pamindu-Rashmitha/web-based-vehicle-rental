@@ -372,7 +372,14 @@
             fetch(`/admin/vehicles/${id}`, {
                 method: 'DELETE',
                 headers: jsonHeaders
-            }).then(() => fetchVehicles());
+            }).then(async response => {
+                if (response.ok) {
+                    fetchVehicles();
+                } else {
+                    const msg = await response.text();
+                    alert('Error deleting vehicle: ' + msg);
+                }
+            });
         }
     }
 </script>

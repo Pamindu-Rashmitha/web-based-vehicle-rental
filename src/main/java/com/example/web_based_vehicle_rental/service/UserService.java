@@ -1,10 +1,13 @@
 package com.example.web_based_vehicle_rental.service;
 
 import com.example.web_based_vehicle_rental.model.User;
+import com.example.web_based_vehicle_rental.model.Reservation;
+import com.example.web_based_vehicle_rental.repository.ReservationRepository;
 import com.example.web_based_vehicle_rental.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -12,26 +15,29 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final ReservationRepository reservationRepository;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+            ReservationRepository reservationRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.reservationRepository = reservationRepository;
     }
 
     public void register(User user) {
-        if(!user.isAgreedToTerms()) {
+        if (!user.isAgreedToTerms()) {
             throw new IllegalStateException("User must agree to terms.");
         }
 
-        if(userRepository.findByUsername(user.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
             throw new IllegalStateException("Username already taken.");
         }
 
-        if(userRepository.findByEmail(user.getEmail()).isPresent()) {
+        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new IllegalStateException("Email already registered.");
         }
 
-        if(user.getUsername().matches("\\d+")) {
+        if (user.getUsername().matches("\\d+")) {
             throw new IllegalArgumentException("Username should not contain only numbers");
         }
 
@@ -65,16 +71,22 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(updatedUser.getPassword()));
         }
 
-        userRepository.save(user);
+        userRepository.save(Objects.requireNonNull(user));
     }
 
     public void deleteAccount(String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        userRepository.delete(user);
+        userRepository.delete(Objects.requireNonNull(user));
     }
 
     public Optional<User> findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    public java.util.List<Reservation> getUserReservations(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return reservationRepository.findByUserId(user.getId());
     }
 }

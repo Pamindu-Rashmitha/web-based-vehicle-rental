@@ -3,6 +3,7 @@ package com.example.web_based_vehicle_rental.controller;
 import com.example.web_based_vehicle_rental.model.User;
 import com.example.web_based_vehicle_rental.model.Vehicle;
 import com.example.web_based_vehicle_rental.service.AdminService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -117,8 +118,11 @@ public class AdminController {
         try {
             adminService.deleteVehicle(id);
             return ResponseEntity.ok("Vehicle deleted successfully");
-        } catch (Exception e) {
+        } catch (IllegalArgumentException e) {
             return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body("Cannot delete vehicle. It may have associated reservations.");
         }
     }
 }

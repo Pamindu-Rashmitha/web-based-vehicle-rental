@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Vehicles - DriveEase Rentals</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0b3d91;
+            --accent-orange: #ff7b00;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .navbar {
+            background-color: var(--primary-blue);
+        }
+        .navbar-brand {
+            font-weight: bold;
+        }
+        .search-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+        }
+        .vehicle-card {
+            transition: transform 0.2s;
+            border: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .vehicle-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .vehicle-img {
+            height: 200px;
+            object-fit: cover;
+            border-top-left-radius: 4px;
+            border-top-right-radius: 4px;
+        }
+        .price-tag {
+            color: var(--accent-orange);
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="/"><i class="fa fa-car-side"></i> DriveEase</a>
+    <div class="ml-auto">
+        <a href="/login" class="btn btn-outline-light btn-sm mr-2">Login</a>
+        <a href="/register" class="btn btn-light btn-sm">Register</a>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="search-container">
+        <h2 class="mb-4">Find Your Perfect Ride</h2>
+        <form id="searchForm" class="form-inline">
+            <label class="sr-only" for="startDate">Start Date</label>
+            <input type="date" class="form-control mb-2 mr-sm-2" id="startDate" required>
+
+            <label class="sr-only" for="endDate">End Date</label>
+            <input type="date" class="form-control mb-2 mr-sm-2" id="endDate" required>
+
+            <label class="sr-only" for="type">Type</label>
+            <select class="form-control mb-2 mr-sm-2" id="type">
+                <option value="">All Types</option>
+                <option value="Sedan">Sedan</option>
+                <option value="SUV">SUV</option>
+                <option value="Bike">Bike</option>
+                <option value="Truck">Truck</option>
+                <option value="Luxury">Luxury</option>
+            </select>
+
+            <label class="sr-only" for="minPrice">Min Price</label>
+            <input type="number" class="form-control mb-2 mr-sm-2" id="minPrice" placeholder="Min Price" min="0">
+
+            <label class="sr-only" for="maxPrice">Max Price</label>
+            <input type="number" class="form-control mb-2 mr-sm-2" id="maxPrice" placeholder="Max Price" min="0">
+
+            <button type="submit" class="btn btn-primary mb-2">Search Availability</button>
+        </form>
+    </div>
+
+    <div id="resultsArea" class="row">
+        <!-- Results will be loaded here -->
+        <div class="col-12 text-center text-muted">
+            <p>Select dates to see available vehicles.</p>
+        </div>
+    </div>
+</div>
+
+<!-- CSRF Token -->
+<meta name="_csrf" th:content="${_csrf.token}"/>
+<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const csrfToken = document.querySelector("meta[name='_csrf']").getAttribute("content");
+    const csrfHeader = document.querySelector("meta[name='_csrf_header']").getAttribute("content");
+
+    document.getElementById('searchForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        const type = document.getElementById('type').value;
+        const minPrice = document.getElementById('minPrice').value;
+        const maxPrice = document.getElementById('maxPrice').value;
+
+        let query = `/api/reservations/search?startDate=${startDate}&endDate=${endDate}`;
+        if (type) query += `&type=${type}`;
+        if (minPrice) query += `&minPrice=${minPrice}`;
+        if (maxPrice) query += `&maxPrice=${maxPrice}`;
+
+        fetch(query)
+            .then(response => response.json())
+            .then(vehicles => {
+                const resultsArea = document.getElementById('resultsArea');
+                resultsArea.innerHTML = '';
+                
+                if (vehicles.length === 0) {
+                    resultsArea.innerHTML = '<div class="col-12 text-center"><p>No vehicles available for these dates.</p></div>';
+                    return;
+                }
+
+                vehicles.forEach(vehicle => {
+                    const card = `
+                        <div class="col-md-4">
+                            <div class="card vehicle-card">
+                                <img src="${vehicle.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'}" class="card-img-top vehicle-img" alt="${vehicle.brand} ${vehicle.model}">
+                                <div class="card-body">
+                                    <h5 class="card-title">${vehicle.brand} ${vehicle.model}</h5>
+                                    <p class="card-text">
+                                        <span class="badge badge-info">${vehicle.type}</span>
+                                        <span class="badge badge-secondary">${vehicle.year}</span>
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="price-tag">$${vehicle.dailyPrice}/day</span>
+                                        <button class="btn btn-primary" onclick="bookVehicle(${vehicle.id})">Book Now</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    resultsArea.innerHTML += card;
+                });
+            });
+    });
+
+    function bookVehicle(vehicleId) {
+        const startDate = document.getElementById('startDate').value;
+        const endDate = document.getElementById('endDate').value;
+        window.location.href = `/booking/confirm?vehicleId=${vehicleId}&startDate=${startDate}&endDate=${endDate}`;
+    }
+</script>
+
+</body>
+</html>

@@ -38,7 +38,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/", "/register", "/login", "/privacy", "/css/**", "/js/**", "/images/**")
+                        .requestMatchers("/", "/register", "/login", "/privacy", "/css/**", "/js/**", "/images/**",
+                                "/browse", "/api/reservations/search")
                         .permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated())
@@ -49,7 +50,10 @@ public class SecurityConfig {
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout")
-                        .permitAll());
+                        .permitAll())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservations/**")); // Optional: Disable CSRF for API
+                                                                                     // if needed, but better to use
+                                                                                     // token
         return http.build();
     }
 }
