@@ -19,10 +19,13 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
     private final VehicleRepository vehicleRepository;
+    private final StripeService stripeService;
 
-    public ReservationService(ReservationRepository reservationRepository, VehicleRepository vehicleRepository) {
+    public ReservationService(ReservationRepository reservationRepository, VehicleRepository vehicleRepository,
+            StripeService stripeService) {
         this.reservationRepository = reservationRepository;
         this.vehicleRepository = vehicleRepository;
+        this.stripeService = stripeService;
     }
 
     public List<Vehicle> searchAvailableVehicles(LocalDate startDate, LocalDate endDate) {
@@ -37,8 +40,7 @@ public class ReservationService {
         if (startDate.isAfter(endDate)) {
             throw new IllegalArgumentException("Start date must be before end date");
         }
-        // Handle empty strings for type if necessary, though controller usually handles
-        // nulls
+
         if (type != null && type.trim().isEmpty()) {
             type = null;
         }
@@ -54,7 +56,6 @@ public class ReservationService {
             throw new IllegalArgumentException("Start date must be before end date");
         }
 
-        // Double-check availability to prevent race conditions (simple check)
         List<Vehicle> availableVehicles = vehicleRepository.findAvailableVehicles(startDate, endDate);
         boolean isAvailable = availableVehicles.stream().anyMatch(v -> v.getId().equals(vehicleId));
 
@@ -105,8 +106,7 @@ public class ReservationService {
         LocalDate currentEndDate = reservation.getEndDate();
         LocalDate newEndDate = currentEndDate.plusDays(extraDays);
 
-        // Check availability for the extension period (start of extension is day after
-        // current end date)
+        // Check availability for the extension period
         LocalDate extensionStartDate = currentEndDate.plusDays(1);
 
         List<Vehicle> availableVehicles = vehicleRepository.findAvailableVehicles(extensionStartDate, newEndDate);
@@ -124,5 +124,64 @@ public class ReservationService {
         reservation.setTotalPrice(reservation.getVehicle().getDailyPrice() * totalDays);
 
         reservationRepository.save(reservation);
+    }
+
+    // Create Stripe checkout session for a reservation
+    @Transactional
+    public String createPaymentCheckout(Reservation reservation) {
+        try {
+            String baseUrl = "http://localhost:8080";
+            String successUrl = baseUrl + "/payment/success";
+            String cancelUrl = baseUrl + "/payment/cancel";
+
+            return stripeService.createCheckoutSession(reservation, successUrl, cancelUrl);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create payment checkout: " + e.getMessage(), e);
+        }
+    }
+
+    // Cancel reservation with refund if payment exists
+
+    @Transactional
+    public String cancelReservationWithRefund(Long reservationId) {
+        if (reservationId == null) {
+            throw new IllegalArgumentException("Reservation ID cannot be null");
+        }
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Reservation not found"));
+
+        if (reservation.getStatus() == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("Reservation is already cancelled");
+        }
+
+        // Check if there's a payment to refund
+        if (reservation.getPayment() != null &&
+                reservation.getPayment()
+                        .getStatus() == com.example.web_based_vehicle_rental.model.PaymentStatus.SUCCEEDED) {
+            try {
+                // Process refund with cancellation fee
+                com.example.web_based_vehicle_rental.model.Payment refundedPayment = stripeService
+                        .processRefund(reservation.getPayment());
+
+                reservation.setPayment(refundedPayment);
+                reservation.setStatus(ReservationStatus.CANCELLED);
+                reservationRepository.save(reservation);
+
+                double refundAmount = refundedPayment.getRefundAmount();
+                double fee = refundedPayment.getAmount() - refundAmount;
+
+                return String.format(
+                        "Reservation cancelled successfully. Refund of $%.2f processed (cancellation fee: $%.2f)",
+                        refundAmount, fee);
+            } catch (Exception e) {
+                throw new RuntimeException("Failed to process refund: " + e.getMessage(), e);
+            }
+        } else {
+            // No payment or payment not successful, just cancel
+            reservation.setStatus(ReservationStatus.CANCELLED);
+            reservationRepository.save(reservation);
+            return "Reservation cancelled successfully";
+        }
     }
 }

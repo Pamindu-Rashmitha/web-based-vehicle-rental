@@ -40,7 +40,8 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .requestMatchers("/", "/register", "/login", "/privacy", "/css/**",
                                                                 "/js/**", "/images/**",
-                                                                "/browse", "/api/reservations/search")
+                                                                "/browse", "/api/reservations/search",
+                                                                "/payment/success", "/payment/cancel")
                                                 .permitAll()
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())
@@ -52,12 +53,7 @@ public class SecurityConfig {
                                                 .logoutUrl("/logout")
                                                 .logoutSuccessUrl("/login?logout")
                                                 .permitAll())
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservations/**")); // Optional:
-                                                                                                     // Disable CSRF for
-                                                                                                     // API
-                                                                                                     // if needed, but
-                                                                                                     // better to use
-                                                                                                     // token
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservations/**"));
                 return http.build();
         }
 }

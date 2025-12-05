@@ -89,6 +89,7 @@
                 <a class="nav-link" id="v-pills-vehicles-tab" data-toggle="pill" href="#v-pills-vehicles" role="tab" aria-controls="v-pills-vehicles" aria-selected="false"><i class="fa fa-car mr-2"></i> Vehicles</a>
                 <a class="nav-link" id="v-pills-reservations-tab" data-toggle="pill" href="#v-pills-reservations" role="tab" aria-controls="v-pills-reservations" aria-selected="false"><i class="fa fa-calendar-alt mr-2"></i> Reservations</a>
                 <a class="nav-link" id="v-pills-reports-tab" data-toggle="pill" href="#v-pills-reports" role="tab" aria-controls="v-pills-reports" aria-selected="false"><i class="fa fa-chart-line mr-2"></i> Reports</a>
+                <a class="nav-link" id="v-pills-payments-tab" data-toggle="pill" href="#v-pills-payments" role="tab" aria-controls="v-pills-payments" aria-selected="false"><i class="fa fa-dollar-sign mr-2"></i> Payments</a>
             </div>
         </div>
         <div class="col-md-10 content-area">
@@ -224,6 +225,61 @@
                     </div>
                 </div>
 
+                <!-- Payments Section -->
+                <div class="tab-pane fade" id="v-pills-payments" role="tabpanel" aria-labelledby="v-pills-payments-tab">
+                    <h3 class="mb-4">Payment Management</h3>
+                    
+                    <!-- Statistics Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="card text-white bg-success">
+                                <div class="card-body">
+                                    <h6 class="card-title">Total Revenue</h6>
+                                    <h3 class="mb-0" id="totalRevenue">$0.00</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-white bg-warning">
+                                <div class="card-body">
+                                    <h6 class="card-title">Total Refunds</h6>
+                                    <h3 class="mb-0" id="totalRefunds">$0.00</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card text-white bg-info">
+                                <div class="card-body">
+                                    <h6 class="card-title">Pending Payments</h6>
+                                    <h3 class="mb-0" id="pendingPayments">0</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payments Table -->
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Reservation</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Refund</th>
+                                        <th>Stripe ID</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentsTableBody">
+                                    <!-- Payments will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -321,6 +377,9 @@
                 loadReports();
             } else if (e.target.id === 'v-pills-reservations-tab') {
                 fetchReservations();
+            } else if (e.target.id === 'v-pills-payments-tab') {
+                loadPayments();
+                loadPaymentStats();
             }
         });
     });
@@ -583,6 +642,53 @@
                     `;
                     tbody.innerHTML += row;
                 });
+            });
+    }
+
+    // --- Payment Management ---
+
+    function loadPayments() {
+        fetch('/admin/payments')
+            .then(res => res.json())
+            .then(payments => {
+                const tbody = document.getElementById('paymentsTableBody');
+                tbody.innerHTML = '';
+                
+                if (payments.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No payments found.</td></tr>';
+                    return;
+                }
+                
+                payments.forEach(p => {
+                    let statusBadge = 'secondary';
+                    if (p.status === 'SUCCEEDED') statusBadge = 'success';
+                    else if (p.status === 'FAILED') statusBadge = 'danger';
+                    else if (p.status === 'REFUNDED') statusBadge = 'warning';
+                    else if (p.status === 'PENDING') statusBadge = 'info';
+
+                    const row = `
+                        <tr>
+                            <td>${p.id}</td>
+                            <td>#${p.reservation?.id || 'N/A'}</td>
+                            <td>$${p.amount.toFixed(2)}</td>
+                            <td><span class="badge badge-${statusBadge}">${p.status}</span></td>
+                            <td>${p.refundAmount ? '$' + p.refundAmount.toFixed(2) : '-'}</td>
+                            <td><small>${p.stripePaymentIntentId || 'Pending'}</small></td>
+                            <td>${new Date(p.createdAt).toLocaleDateString()}</td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            });
+    }
+
+    function loadPaymentStats() {
+        fetch('/admin/payments/stats')
+            .then(res => res.json())
+            .then(stats => {
+                document.getElementById('totalRevenue').innerText = '$' + (stats.totalRevenue || 0).toFixed(2);
+                document.getElementById('totalRefunds').innerText = '$' + (stats.totalRefunds || 0).toFixed(2);
+                document.getElementById('pendingPayments').innerText = stats.pendingPayments || 0;
             });
     }
 </script>

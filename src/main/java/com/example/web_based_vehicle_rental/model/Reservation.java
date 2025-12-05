@@ -1,5 +1,6 @@
 package com.example.web_based_vehicle_rental.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -30,6 +31,10 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private ReservationStatus status;
+
+    @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Payment payment;
 
     public Reservation() {
         this.status = ReservationStatus.PENDING;
@@ -98,5 +103,13 @@ public class Reservation {
 
     public void setStatus(ReservationStatus status) {
         this.status = status;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 }

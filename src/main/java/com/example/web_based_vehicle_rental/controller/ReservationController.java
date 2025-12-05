@@ -38,8 +38,8 @@ public class ReservationController {
                 reservationService.searchAvailableVehiclesWithFilters(startDate, endDate, type, minPrice, maxPrice));
     }
 
-    @PostMapping("/book")
-    public ResponseEntity<?> bookVehicle(@RequestBody Map<String, Object> bookingRequest) {
+    @PostMapping("/create-checkout-session")
+    public ResponseEntity<?> createCheckoutSession(@RequestBody Map<String, Object> bookingRequest) {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             String username = auth.getName();
@@ -50,20 +50,25 @@ public class ReservationController {
             LocalDate startDate = LocalDate.parse(bookingRequest.get("startDate").toString());
             LocalDate endDate = LocalDate.parse(bookingRequest.get("endDate").toString());
 
+            // Create a temporary reservation for checkout
             Reservation reservation = reservationService.createReservation(user, vehicleId, startDate, endDate);
-            return ResponseEntity.ok(reservation);
+
+            // Create Stripe checkout session
+            String checkoutUrl = reservationService.createPaymentCheckout(reservation);
+
+            return ResponseEntity.ok(Map.of("checkoutUrl", checkoutUrl));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 
     @PostMapping("/{id}/cancel")
     public ResponseEntity<?> cancelReservation(@PathVariable Long id) {
         try {
-            reservationService.cancelReservation(id);
-            return ResponseEntity.ok("Reservation cancelled successfully");
+            String result = reservationService.cancelReservationWithRefund(id);
+            return ResponseEntity.ok(Map.of("message", result));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
 

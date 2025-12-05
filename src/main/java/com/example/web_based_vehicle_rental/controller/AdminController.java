@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -148,5 +149,21 @@ public class AdminController {
     @GetMapping("/reservations")
     public ResponseEntity<List<com.example.web_based_vehicle_rental.model.Reservation>> getAllReservations() {
         return ResponseEntity.ok(adminService.getAllReservations());
+    }
+
+    // Payment Management Endpoints
+
+    @GetMapping("/payments")
+    public ResponseEntity<List<com.example.web_based_vehicle_rental.model.Payment>> getAllPayments() {
+        return ResponseEntity.ok(adminService.getAllPayments());
+    }
+
+    @GetMapping("/payments/stats")
+    public ResponseEntity<?> getPaymentStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalRevenue", adminService.getTotalRevenue());
+        stats.put("totalRefunds", adminService.getTotalRefunds());
+        stats.put("pendingPayments", adminService.getPendingPaymentsCount());
+        return ResponseEntity.ok(stats);
     }
 }

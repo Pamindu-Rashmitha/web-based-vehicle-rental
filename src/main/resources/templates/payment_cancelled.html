@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Cancelled - DriveEase Rentals</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary-blue: #0b3d91;
+            --accent-orange: #ff7b00;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f7f6;
+        }
+        .navbar {
+            background-color: var(--primary-blue);
+        }
+        .cancel-container {
+            max-width: 600px;
+            margin: 4rem auto;
+            text-align: center;
+        }
+        .cancel-card {
+            background: white;
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .cancel-icon {
+            width: 80px;
+            height: 80px;
+            background: #ffc107;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+        .cancel-icon i {
+            color: white;
+            font-size: 3rem;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="/"><i class="fa fa-car-side"></i> DriveEase</a>
+</nav>
+
+<div class="cancel-container">
+    <div class="cancel-card">
+        <div class="cancel-icon">
+            <i class="fas fa-times"></i>
+        </div>
+        
+        <h2 class="text-warning mb-3">Payment Cancelled</h2>
+        <p class="text-muted mb-4" th:text="${message}">Payment was cancelled. You can try booking again.</p>
+        
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle mr-2"></i>
+            <strong>Note:</strong> No charges were made to your account.
+        </div>
+        
+        <div class="mt-4">
+            <a href="/browse" class="btn btn-primary btn-lg px-5 mr-2">
+                <i class="fas fa-search mr-2"></i>Browse Vehicles
+            </a>
+            <a href="/" class="btn btn-outline-secondary btn-lg px-5">
+                <i class="fas fa-home mr-2"></i>Home
+            </a>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

@@ -6,6 +6,7 @@ import com.example.web_based_vehicle_rental.repository.UserRepository;
 
 import com.example.web_based_vehicle_rental.repository.VehicleRepository;
 import com.example.web_based_vehicle_rental.repository.ReservationRepository;
+import com.example.web_based_vehicle_rental.repository.PaymentRepository;
 import com.example.web_based_vehicle_rental.model.Reservation;
 import com.example.web_based_vehicle_rental.model.ReservationStatus;
 import java.time.LocalDate;
@@ -21,12 +22,15 @@ public class AdminService {
     private final UserRepository userRepository;
     private final VehicleRepository vehicleRepository;
     private final ReservationRepository reservationRepository;
+    private final PaymentRepository paymentRepository;
 
     public AdminService(UserRepository userRepository, VehicleRepository vehicleRepository,
-            ReservationRepository reservationRepository) {
+            ReservationRepository reservationRepository,
+            PaymentRepository paymentRepository) {
         this.userRepository = userRepository;
         this.vehicleRepository = vehicleRepository;
         this.reservationRepository = reservationRepository;
+        this.paymentRepository = paymentRepository;
     }
 
     // User Management
@@ -124,5 +128,25 @@ public class AdminService {
 
     public List<Reservation> getAllReservations() {
         return reservationRepository.findAll();
+    }
+
+    // Payment Management
+    public List<com.example.web_based_vehicle_rental.model.Payment> getAllPayments() {
+        return paymentRepository.findAll();
+    }
+
+    public Double getTotalRevenue() {
+        Double revenue = paymentRepository.getTotalRevenue();
+        return revenue != null ? revenue : 0.0;
+    }
+
+    public Double getTotalRefunds() {
+        Double refunds = paymentRepository.getTotalRefunds();
+        return refunds != null ? refunds : 0.0;
+    }
+
+    public Long getPendingPaymentsCount() {
+        Long count = paymentRepository.countPendingPayments();
+        return count != null ? count : 0L;
     }
 }

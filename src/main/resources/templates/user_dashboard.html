@@ -178,16 +178,16 @@
 
         <div class="text-center mt-5">
             <a href="/browse" class="btn btn-success btn-lg px-5">
-                <i class="fa fa-car mr-2"></i> Book Another Vehicle
+                <i class="fa fa-car mr-2"></i> Book Vehicle
             </a>
         </div>
     </div>
 </div>
 
-<!-- NULL-SAFE FRAGMENTS (NO parameters passed!) -->
+
 <table style="display: none;">
-    <!-- Vehicle Cell Fragment -->
-    <!-- Vehicle Cell Fragment -->
+    
+    
     <td th:fragment="vehicleCell">
         <div class="d-flex align-items-center">
             <img th:src="${vehicle?.imageUrl} ?: 'https://via.placeholder.com/90x60?text=No+Image'"
@@ -207,7 +207,7 @@
         </div>
     </td>
 
-    <!-- Date Cell Fragment -->
+    
     <td th:fragment="dateCell">
         <div>
             <strong th:text="${#temporals.format(startDate, 'MMM dd, yyyy')}">Start</strong>
@@ -222,7 +222,7 @@
     </td>
 </table>
 
-<!-- Extend Modal -->
+
 <div class="modal fade" id="extendModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
