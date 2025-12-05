@@ -47,6 +47,8 @@
         .badge-completed { background-color: #28a745; }
         .badge-cancelled { background-color: #dc3545; }
         .text-strike { text-decoration: line-through; color: #999; }
+        img.vehicle-img { background: #f8f9fa; }
+  img:not([src]) { visibility: hidden; }
     </style>
 </head>
 <body>
@@ -290,6 +292,8 @@
         .then(r => r.ok ? (alert('Rental extended successfully!'), location.reload()) : r.text().then(alert))
         .catch(() => alert('Failed to extend. Please try again.'));
     }
+
+    const imageUrl = vehicle.primaryImageUrl || vehicle.imageUrl || '/images/no-image.png';
 </script>
 
 </body>

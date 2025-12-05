@@ -1,9 +1,13 @@
 package com.example.web_based_vehicle_rental.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Vehicle {
@@ -37,8 +41,13 @@ public class Vehicle {
     @Min(value = 0, message = "Price must be positive")
     private Double dailyPrice;
 
+    @OneToMany(mappedBy = "vehicle", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonManagedReference
+    private List<VehicleImage> images = new ArrayList<>();
+
     public Vehicle() {
         this.status = VehicleStatus.AVAILABLE;
+        this.images = new ArrayList<>();
     }
 
     public Vehicle(String brand, String model, int year, String licensePlate, Double dailyPrice, String type) {
@@ -121,5 +130,40 @@ public class Vehicle {
 
     public void setDailyPrice(Double dailyPrice) {
         this.dailyPrice = dailyPrice;
+    }
+
+    public List<VehicleImage> getImages() {
+        return images;
+    }
+
+    public void setImages(List<VehicleImage> images) {
+        this.images = images;
+    }
+
+    public void addImage(VehicleImage image) {
+        images.add(image);
+        image.setVehicle(this);
+    }
+
+    public void removeImage(VehicleImage image) {
+        images.remove(image);
+        image.setVehicle(null);
+    }
+
+    // Helper method to get primary image URL for backward compatibility
+    @com.fasterxml.jackson.annotation.JsonProperty("primaryImageUrl")
+    public String getPrimaryImageUrl() {
+        try {
+            if (images != null && !images.isEmpty()) {
+                return images.stream()
+                        .filter(VehicleImage::getIsPrimary)
+                        .findFirst()
+                        .map(VehicleImage::getImageUrl)
+                        .orElse(imageUrl);
+            }
+        } catch (Exception e) {
+            // Handle lazy loading exception gracefully
+        }
+        return imageUrl; // Fallback to old imageUrl field
     }
 }

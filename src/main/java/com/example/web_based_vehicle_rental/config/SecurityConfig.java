@@ -40,6 +40,7 @@ public class SecurityConfig {
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .requestMatchers("/", "/register", "/login", "/privacy", "/css/**",
                                                                 "/js/**", "/images/**",
+                                                                "/vehicles", "/api/public/**",
                                                                 "/browse", "/api/reservations/search",
                                                                 "/payment/success", "/payment/cancel")
                                                 .permitAll()

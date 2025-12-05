@@ -14,6 +14,7 @@ import java.util.Arrays;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -23,14 +24,17 @@ public class AdminService {
     private final VehicleRepository vehicleRepository;
     private final ReservationRepository reservationRepository;
     private final PaymentRepository paymentRepository;
+    private final com.example.web_based_vehicle_rental.repository.VehicleImageRepository vehicleImageRepository;
 
     public AdminService(UserRepository userRepository, VehicleRepository vehicleRepository,
             ReservationRepository reservationRepository,
-            PaymentRepository paymentRepository) {
+            PaymentRepository paymentRepository,
+            com.example.web_based_vehicle_rental.repository.VehicleImageRepository vehicleImageRepository) {
         this.userRepository = userRepository;
         this.vehicleRepository = vehicleRepository;
         this.reservationRepository = reservationRepository;
         this.paymentRepository = paymentRepository;
+        this.vehicleImageRepository = vehicleImageRepository;
     }
 
     // User Management
@@ -148,5 +152,75 @@ public class AdminService {
     public Long getPendingPaymentsCount() {
         Long count = paymentRepository.countPendingPayments();
         return count != null ? count : 0L;
+    }
+
+    // Vehicle Image Management
+    public com.example.web_based_vehicle_rental.model.VehicleImage addVehicleImage(Long vehicleId, String imageUrl,
+            Boolean isPrimary) {
+        if (vehicleId == null)
+            throw new IllegalArgumentException("Vehicle ID cannot be null");
+
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+
+        // If this is set as primary, unset all other primary images for this vehicle
+        if (isPrimary != null && isPrimary) {
+            vehicle.getImages().forEach(img -> img.setIsPrimary(false));
+        }
+
+        com.example.web_based_vehicle_rental.model.VehicleImage image = new com.example.web_based_vehicle_rental.model.VehicleImage(
+                vehicle, imageUrl, isPrimary);
+        vehicle.addImage(image);
+
+        // Update vehicle's imageUrl field if this is the primary image
+        if (isPrimary != null && isPrimary) {
+            vehicle.setImageUrl(imageUrl);
+        }
+
+        vehicleRepository.save(vehicle);
+        return image;
+    }
+
+    public void deleteVehicleImage(Long vehicleId, Long imageId) {
+        if (vehicleId == null)
+            throw new IllegalArgumentException("Vehicle ID cannot be null");
+        if (imageId == null)
+            throw new IllegalArgumentException("Image ID cannot be null");
+
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+
+        com.example.web_based_vehicle_rental.model.VehicleImage imageToRemove = vehicle.getImages().stream()
+                .filter(img -> img.getId().equals(imageId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Image not found"));
+
+        vehicle.removeImage(imageToRemove);
+        vehicleImageRepository.delete(Objects.requireNonNull(imageToRemove));
+        vehicleRepository.save(vehicle);
+    }
+
+    public void setPrimaryImage(Long vehicleId, Long imageId) {
+        if (vehicleId == null)
+            throw new IllegalArgumentException("Vehicle ID cannot be null");
+        if (imageId == null)
+            throw new IllegalArgumentException("Image ID cannot be null");
+
+        Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> new RuntimeException("Vehicle not found"));
+
+        // Unset all primary images
+        vehicle.getImages().forEach(img -> img.setIsPrimary(false));
+
+        // Set the specified image as primary
+        com.example.web_based_vehicle_rental.model.VehicleImage primaryImage = vehicle.getImages().stream()
+                .filter(img -> img.getId().equals(imageId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Image not found"));
+
+        primaryImage.setIsPrimary(true);
+        vehicle.setImageUrl(primaryImage.getImageUrl()); // Update backward compatibility field
+
+        vehicleRepository.save(vehicle);
     }
 }

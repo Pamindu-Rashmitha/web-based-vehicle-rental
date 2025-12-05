@@ -166,4 +166,45 @@ public class AdminController {
         stats.put("pendingPayments", adminService.getPendingPaymentsCount());
         return ResponseEntity.ok(stats);
     }
+
+    // Vehicle Image Management Endpoints
+
+    @PostMapping("/vehicles/{id}/images")
+    public ResponseEntity<?> addVehicleImage(
+            @PathVariable Long id,
+            @RequestParam("image") org.springframework.web.multipart.MultipartFile file,
+            @RequestParam(value = "isPrimary", defaultValue = "false") Boolean isPrimary) {
+        try {
+            String imageUrl = adminService.saveVehicleImage(file);
+            com.example.web_based_vehicle_rental.model.VehicleImage vehicleImage = adminService.addVehicleImage(id,
+                    imageUrl, isPrimary);
+            return ResponseEntity.ok(vehicleImage);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error adding image: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/vehicles/{vehicleId}/images/{imageId}")
+    public ResponseEntity<?> deleteVehicleImage(
+            @PathVariable Long vehicleId,
+            @PathVariable Long imageId) {
+        try {
+            adminService.deleteVehicleImage(vehicleId, imageId);
+            return ResponseEntity.ok("Image deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error deleting image: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/vehicles/{vehicleId}/images/{imageId}/primary")
+    public ResponseEntity<?> setPrimaryImage(
+            @PathVariable Long vehicleId,
+            @PathVariable Long imageId) {
+        try {
+            adminService.setPrimaryImage(vehicleId, imageId);
+            return ResponseEntity.ok("Primary image updated successfully");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Error setting primary image: " + e.getMessage());
+        }
+    }
 }

@@ -20,6 +20,13 @@
         }
         .navbar-brand {
             font-weight: bold;
+            color: white !important;
+        }
+        .nav-link {
+            color: white !important;
+        }
+        .nav-link:hover {
+            color: var(--accent-orange) !important;
         }
         .search-container {
             background: white;
@@ -50,6 +57,14 @@
             font-weight: bold;
             font-size: 1.2rem;
         }
+        .login-prompt {
+            background-color: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 4px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -57,22 +72,20 @@
 <nav class="navbar navbar-expand-lg navbar-dark">
     <a class="navbar-brand" href="/"><i class="fa fa-car-side"></i> DriveEase</a>
     <div class="ml-auto">
-        <a class="nav-link d-inline" href="/user/dashboard"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
-        <a class="nav-link d-inline" href="/user/profile"><i class="fa fa-user"></i> Profile</a>
-        <a class="nav-link d-inline" href="/logout"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        <a class="nav-link d-inline" href="/login"><i class="fa fa-sign-in-alt"></i> Login</a>
+        <a class="nav-link d-inline" href="/register"><i class="fa fa-user-plus"></i> Register</a>
     </div>
 </nav>
 
 <div class="container">
+    <div class="login-prompt">
+        <i class="fa fa-info-circle"></i>
+        <strong>Want to book a vehicle?</strong> Please <a href="/login">login</a> or <a href="/register">create an account</a> to make a reservation.
+    </div>
+
     <div class="search-container">
-        <h2 class="mb-4">Find Your Perfect Ride</h2>
+        <h2 class="mb-4">Browse Our Fleet</h2>
         <form id="searchForm" class="form-inline">
-            <label class="sr-only" for="startDate">Start Date</label>
-            <input type="date" class="form-control mb-2 mr-sm-2" id="startDate" required>
-
-            <label class="sr-only" for="endDate">End Date</label>
-            <input type="date" class="form-control mb-2 mr-sm-2" id="endDate" required>
-
             <label class="sr-only" for="type">Type</label>
             <select class="form-control mb-2 mr-sm-2" id="type">
                 <option value="">All Types</option>
@@ -89,7 +102,8 @@
             <label class="sr-only" for="maxPrice">Max Price</label>
             <input type="number" class="form-control mb-2 mr-sm-2" id="maxPrice" placeholder="Max Price" min="0">
 
-            <button type="submit" class="btn btn-primary mb-2">Search Availability</button>
+            <button type="submit" class="btn btn-primary mb-2">Filter</button>
+            <button type="button" class="btn btn-secondary mb-2 ml-2" onclick="resetFilters()">Reset</button>
         </form>
     </div>
 
@@ -100,17 +114,11 @@
     </div>
 </div>
 
-<!-- CSRF Token -->
-<meta name="_csrf" th:content="${_csrf.token}"/>
-<meta name="_csrf_header" th:content="${_csrf.headerName}"/>
-
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // CSRF setup (only needed for POST/PUT/DELETE, but safe to have)
-    const csrfToken = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
-    const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
+    let allVehicles = [];
 
     // Load vehicles when page is ready
     document.addEventListener('DOMContentLoaded', () => {
@@ -118,34 +126,29 @@
     });
 
     function loadAllVehicles() {
-    fetch('/api/vehicles', {
-        credentials: 'include',  
-        headers: { 'Accept': 'application/json' }
-    })
-    .then(response => {
-        if (!response.ok) {
-            // Show actual HTML error in console for debugging
-            response.text().then(text => {
-                console.error('Server returned HTML (not JSON):', text.substring(0, 500));
-            });
-            throw new Error(`HTTP ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(vehicles => {
-        if (!Array.isArray(vehicles)) throw new Error('Not an array');
-        displayVehicles(vehicles);
-    })
-    .catch(error => {
-        console.error('Load failed:', error);
-        document.getElementById('resultsArea').innerHTML = `
-            <div class="col-12 text-center text-danger py-5">
-                <h5>Cannot load vehicles</h5>
-                <p>${error.message}</p>
-                <small>Most likely cause: you are not logged in or the API requires authentication.</small>
-            </div>`;
-    });
-}
+        fetch('/api/public/vehicles', {
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(vehicles => {
+            if (!Array.isArray(vehicles)) throw new Error('Not an array');
+            allVehicles = vehicles;
+            displayVehicles(vehicles);
+        })
+        .catch(error => {
+            console.error('Load failed:', error);
+            document.getElementById('resultsArea').innerHTML = `
+                <div class="col-12 text-center text-danger py-5">
+                    <h5>Cannot load vehicles</h5>
+                    <p>${error.message}</p>
+                </div>`;
+        });
+    }
 
     function displayVehicles(vehicles) {
         const resultsArea = document.getElementById('resultsArea');
@@ -170,9 +173,9 @@
                             </p>
                             <div class="mt-auto d-flex justify-content-between align-items-center">
                                 <span class="price-tag">$${Number(vehicle.dailyPrice).toFixed(2)}/day</span>
-                                <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showBookingOptions(${vehicle.id})">
-                                    Book Now
-                                </button>
+                                <span class="badge badge-${vehicle.status === 'AVAILABLE' ? 'success' : 'warning'}">
+                                    ${escapeHtml(vehicle.status || 'UNKNOWN')}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -182,7 +185,7 @@
         });
     }
 
-    // Simple HTML escape to prevent XSS when injecting data
+    // Simple HTML escape to prevent XSS
     function escapeHtml(text) {
         if (!text) return '';
         return String(text).replace(/[&<>"']/g, match => ({
@@ -190,47 +193,36 @@
         })[match]);
     }
 
-    // Search form handler
+    // Filter form handler
     document.getElementById('searchForm').addEventListener('submit', function(e) {
         e.preventDefault();
-
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        const type = document.getElementById('type').value;
-        const minPrice = document.getElementById('minPrice').value;
-        const maxPrice = document.getElementById('maxPrice').value;
-
-        if (!startDate || !endDate) {
-            alert('Please select both start and end dates.');
-            return;
-        }
-
-        let url = `/api/reservations/search?startDate=${startDate}&endDate=${endDate}`;
-        if (type) url += `&type=${encodeURIComponent(type)}`;
-        if (minPrice) url += `&minPrice=${minPrice}`;
-        if (maxPrice) url += `&maxPrice=${maxPrice}`;
-
-        fetch(url, { headers: { 'Accept': 'application/json' } })
-            .then(response => {
-                if (!response.ok) throw new Error(`Search failed: ${response.status}`);
-                return response.json();
-            })
-            .then(vehicles => {
-                if (!Array.isArray(vehicles)) throw new Error('Invalid response format');
-                displayVehicles(vehicles);
-            })
-            .catch(err => {
-                console.error(err);
-                document.getElementById('resultsArea').innerHTML = `
-                    <div class="col-12 text-center text-danger py-5">
-                        <p>Search failed: ${err.message}</p>
-                    </div>`;
-            });
+        filterVehicles();
     });
+
+    function filterVehicles() {
+        const type = document.getElementById('type').value;
+        const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+        const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+
+        let filtered = allVehicles.filter(v => {
+            const matchType = !type || v.type === type;
+            const matchPrice = v.dailyPrice >= minPrice && v.dailyPrice <= maxPrice;
+            return matchType && matchPrice;
+        });
+
+        displayVehicles(filtered);
+    }
+
+    function resetFilters() {
+        document.getElementById('type').value = '';
+        document.getElementById('minPrice').value = '';
+        document.getElementById('maxPrice').value = '';
+        displayVehicles(allVehicles);
+    }
 
     // Show detailed modal
     function showVehicleDetails(vehicleId) {
-        fetch(`/api/vehicles/${vehicleId}`, {
+        fetch(`/api/public/vehicles/${vehicleId}`, {
             headers: { 'Accept': 'application/json' }
         })
         .then(response => {
@@ -312,18 +304,16 @@
                                         <strong>Price per day</strong>
                                         <span class="price-tag">$${Number(vehicle.dailyPrice || 0).toFixed(2)}</span>
                                     </li>
-                                    <li class="list-group-item d-flex justify-content-between">
-                                        <strong>License Plate</strong>
-                                        <span>${escapeHtml(vehicle.licensePlate || 'N/A')}</span>
-                                    </li>
                                 </ul>
+                            </div>
+
+                            <div class="alert alert-info mt-3">
+                                <i class="fa fa-info-circle"></i> Please <a href="/login" class="alert-link">login</a> to book this vehicle.
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary" onclick="showBookingOptions(${vehicle.id})">
-                                Book This Vehicle
-                            </button>
+                            <a href="/login" class="btn btn-primary">Login to Book</a>
                         </div>
                     </div>
                 </div>
@@ -341,19 +331,6 @@
         $('#vehicleDetailModal').on('hidden.bs.modal', function () {
             $(this).remove();
         });
-    }
-
-    function showBookingOptions(vehicleId) {
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-
-        if (!startDate || !endDate) {
-            alert('Please select pickup and return dates before booking.');
-            $('#vehicleDetailModal')?.modal('hide');
-            return;
-        }
-
-        window.location.href = `/booking/confirm?vehicleId=${vehicleId}&startDate=${startDate}&endDate=${endDate}`;
     }
 </script>
 
