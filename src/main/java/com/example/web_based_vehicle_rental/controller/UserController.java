@@ -70,6 +70,16 @@ public class UserController {
         return "privacy";
     }
 
+    @GetMapping("/terms")
+    public String showTermsOfService() {
+        return "terms";
+    }
+
+    @GetMapping("/about")
+    public String showAboutUs() {
+        return "about";
+    }
+
     @GetMapping("/profile")
     public String showProfile(Model model) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();

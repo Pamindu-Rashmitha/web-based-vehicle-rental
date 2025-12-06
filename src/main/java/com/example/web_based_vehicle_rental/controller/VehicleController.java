@@ -19,16 +19,16 @@ public class VehicleController {
         this.vehicleRepository = vehicleRepository;
     }
 
-    @GetMapping("") // → /api/vehicles
+    @GetMapping("")
     @Transactional(readOnly = true)
     public List<Vehicle> getAllVehicles() {
         List<Vehicle> vehicles = vehicleRepository.findAll();
         // Force initialization of images while session is open
-        vehicles.forEach(v -> v.getImages().size()); // ← THIS LINE FIXES EVERYTHING
+        vehicles.forEach(v -> v.getImages().size());
         return vehicles;
     }
 
-    @GetMapping("/{id}") // → /api/vehicles/5
+    @GetMapping("/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<Vehicle> getVehicleById(@PathVariable @NonNull Long id) {
         return vehicleRepository.findById(id)

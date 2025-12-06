@@ -11,5 +11,9 @@ public class WebConfig implements WebMvcConfigurer {
     public void addResourceHandlers(@org.springframework.lang.NonNull ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("file:C:/Users/pamid/vehicle-rental-images/");
+
+        // Serve uploaded support screenshots
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations("file:uploads/");
     }
 }

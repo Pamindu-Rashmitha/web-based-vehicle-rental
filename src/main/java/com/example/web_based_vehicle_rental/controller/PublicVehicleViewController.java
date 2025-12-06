@@ -12,24 +12,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-/**
- * Controller for public vehicle viewing pages (no authentication required)
- */
 @Controller
 public class PublicVehicleViewController {
 
-    /**
-     * Serves the public vehicle viewing page
-     */
     @GetMapping("/vehicles")
     public String vehiclesPage() {
         return "vehicles";
     }
 }
 
-/**
- * REST controller for public vehicle API endpoints (no authentication required)
- */
 @RestController
 class PublicVehicleApiController {
 
@@ -39,9 +30,6 @@ class PublicVehicleApiController {
         this.vehicleRepository = vehicleRepository;
     }
 
-    /**
-     * Get all vehicles (public endpoint, no authentication required)
-     */
     @GetMapping("/api/public/vehicles")
     @Transactional(readOnly = true)
     public List<Vehicle> getAllVehiclesPublic() {
@@ -51,9 +39,6 @@ class PublicVehicleApiController {
         return vehicles;
     }
 
-    /**
-     * Get vehicle by ID (public endpoint)
-     */
     @GetMapping("/api/public/vehicles/{id}")
     @Transactional(readOnly = true)
     public ResponseEntity<Vehicle> getVehicleByIdPublic(@PathVariable @NonNull Long id) {

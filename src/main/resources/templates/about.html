@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - DriveEase</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-blue: #0b3d91;
+            --accent-orange: #ff7b00;
+            --text-dark: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand {
+            color: white;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .navbar-brand i {
+            color: var(--accent-orange);
+            margin-right: 8px;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 80px 0;
+            text-align: center;
+            color: white;
+        }
+
+        .hero-section h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .hero-section p {
+            font-size: 1.3rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.95;
+        }
+
+        .content-wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        .section h2 {
+            color: var(--primary-blue);
+            font-weight: 800;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            text-align: center;
+        }
+
+        .section p {
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+        }
+
+        .story-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+
+        .values-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .value-card {
+            background: white;
+            padding: 35px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .value-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .value-card i {
+            font-size: 3rem;
+            color: var(--accent-orange);
+            margin-bottom: 20px;
+        }
+
+        .value-card h3 {
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .value-card p {
+            font-size: 0.95rem;
+            color: #666;
+        }
+
+        .stats-section {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 60px 0;
+            margin: 60px 0;
+            border-radius: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+            color: white;
+        }
+
+        .stat-item h3 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+        }
+
+        .stat-item p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            color: white;
+        }
+
+        .team-section {
+            text-align: center;
+        }
+
+        .cta-section {
+            background: var(--accent-orange);
+            padding: 60px 40px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            margin-top: 60px;
+        }
+
+        .cta-section h2 {
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            color: white;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+        }
+
+        .btn-cta {
+            background: white;
+            color: var(--accent-orange);
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: var(--accent-orange);
+            text-decoration: none;
+        }
+
+        footer {
+            background: #1a1a1a;
+            color: #aaa;
+            padding: 30px 0;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        footer a {
+            color: var(--accent-orange);
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2rem;
+            }
+
+            .hero-section p {
+                font-size: 1.1rem;
+            }
+
+            .stat-item h3 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" th:href="@{/}">
+        <i class="fa fa-car-side"></i>DriveEase
+    </a>
+</nav>
+
+<div class="hero-section">
+    <h1>About DriveEase</h1>
+    <p>Revolutionizing the way people rent vehicles. Simple, reliable, and hassle-free.</p>
+</div>
+
+<div class="content-wrapper">
+    <div class="section">
+        <h2>Our Story</h2>
+        <div class="story-card">
+            <p>Founded in 2020, DriveEase was born from a simple observation: renting a vehicle shouldn't be complicated. Our founders, frustrated by the lengthy paperwork, hidden fees, and poor customer service in the traditional rental industry, set out to create a better solution.</p>
+            
+            <p>What started as a small operation with just 10 vehicles has grown into a thriving platform serving thousands of customers across the country. We've built our success on three core principles: transparency, convenience, and exceptional service.</p>
+            
+            <p>Today, DriveEase is proud to offer one of the largest selections of vehicles available for rent, from economical sedans to luxury cars, all bookable with just a few clicks. But we're not stopping there—we're constantly innovating to make vehicle rental even easier and more accessible for everyone.</p>
+        </div>
+    </div>
+
+    <div class="stats-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="stat-item">
+                        <h3>10,000+</h3>
+                        <p>Happy Customers</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="stat-item">
+                        <h3>5,000+</h3>
+                        <p>Vehicles</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="stat-item">
+                        <h3>50+</h3>
+                        <p>Cities</p>
+                    </div>
+                </div>
+                <div class="col-md-3 col-6 mb-4">
+                    <div class="stat-item">
+                        <h3>4.9</h3>
+                        <p>Average Rating</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Our Mission</h2>
+        <div class="story-card">
+            <p style="font-size: 1.2rem; text-align: center; font-weight: 500; color: var(--primary-blue);">
+                "To make vehicle rental accessible, affordable, and effortless for everyone, everywhere."
+            </p>
+            <p>We believe that everyone deserves access to reliable transportation without the headaches traditionally associated with vehicle rental. Whether you're planning a road trip, need a temporary replacement vehicle, or want to test drive a luxury car for a weekend, we're here to make it happen seamlessly.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Our Values</h2>
+        <div class="values-grid">
+            <div class="value-card">
+                <i class="fa fa-heart"></i>
+                <h3>Customer First</h3>
+                <p>Every decision we make starts with asking: "Is this best for our customers?" Their satisfaction is our success.</p>
+            </div>
+            <div class="value-card">
+                <i class="fa fa-shield-alt"></i>
+                <h3>Trust & Safety</h3>
+                <p>We maintain the highest standards for vehicle safety and customer data protection. Your trust is our most valuable asset.</p>
+            </div>
+            <div class="value-card">
+                <i class="fa fa-lightbulb"></i>
+                <h3>Innovation</h3>
+                <p>We're constantly improving our platform and services to stay ahead of customer needs and industry trends.</p>
+            </div>
+            <div class="value-card">
+                <i class="fa fa-handshake"></i>
+                <h3>Transparency</h3>
+                <p>No hidden fees, no fine print surprises. What you see is what you pay—clear, honest, and upfront.</p>
+            </div>
+            <div class="value-card">
+                <i class="fa fa-leaf"></i>
+                <h3>Sustainability</h3>
+                <p>We're committed to reducing our environmental impact by expanding our fleet of electric and hybrid vehicles.</p>
+            </div>
+            <div class="value-card">
+                <i class="fa fa-users"></i>
+                <h3>Community</h3>
+                <p>We're more than a rental service—we're building a community of travelers and adventurers.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="section team-section">
+        <h2>Why Choose DriveEase?</h2>
+        <div class="story-card">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <h4 style="color: var(--primary-blue); font-weight: 700; margin-bottom: 15px;">
+                        <i class="fa fa-check-circle" style="color: var(--accent-orange);"></i> Instant Booking
+                    </h4>
+                    <p>Book your vehicle in under 2 minutes with our streamlined process. No waiting, no paperwork.</p>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h4 style="color: var(--primary-blue); font-weight: 700; margin-bottom: 15px;">
+                        <i class="fa fa-check-circle" style="color: var(--accent-orange);"></i> Best Price Guarantee
+                    </h4>
+                    <p>We constantly monitor market prices to ensure you're getting the best deal available.</p>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h4 style="color: var(--primary-blue); font-weight: 700; margin-bottom: 15px;">
+                        <i class="fa fa-check-circle" style="color: var(--accent-orange);"></i> 24/7 Support
+                    </h4>
+                    <p>Our customer support team is always available to help, no matter where you are or what time it is.</p>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <h4 style="color: var(--primary-blue); font-weight: 700; margin-bottom: 15px;">
+                        <i class="fa fa-check-circle" style="color: var(--accent-orange);"></i> Flexible Cancellation
+                    </h4>
+                    <p>Plans change—we get it. Free cancellation up to 24 hours before your rental starts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="cta-section">
+        <h2>Ready to Experience the DriveEase Difference?</h2>
+        <p>Join thousands of satisfied customers who've made the switch to hassle-free vehicle rental.</p>
+        <a th:href="@{/browse}" class="btn-cta">
+            <i class="fa fa-car mr-2"></i>Browse Vehicles Now
+        </a>
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2025 DriveEase. All Rights Reserved. | <a th:href="@{/}">Home</a> | <a th:href="@{/terms}">Terms of Service</a> | <a th:href="@{/privacy}">Privacy Policy</a></p>
+</footer>
+
+</body>
+</html>

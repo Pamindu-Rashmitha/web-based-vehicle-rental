@@ -58,8 +58,10 @@
     <a class="navbar-brand" href="/"><i class="fa fa-car-side"></i> DriveEase</a>
     <div class="ml-auto">
         <a class="nav-link d-inline" href="/user/dashboard"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
-        <a class="nav-link d-inline" href="/user/profile"><i class="fa fa-user"></i> Profile</a>
-        <a class="nav-link d-inline" href="/logout"><i class="fa fa-sign-out-alt"></i> Logout</a>
+        <a class="nav-link d-inline" href="/profile"><i class="fa fa-user"></i> Profile</a>
+        <form th:action="@{/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-light btn-sm">Logout</button>
+        </form>
     </div>
 </nav>
 

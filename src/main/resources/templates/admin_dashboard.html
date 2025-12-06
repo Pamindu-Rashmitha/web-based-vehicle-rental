@@ -90,6 +90,7 @@
                 <a class="nav-link" id="v-pills-reservations-tab" data-toggle="pill" href="#v-pills-reservations" role="tab" aria-controls="v-pills-reservations" aria-selected="false"><i class="fa fa-calendar-alt mr-2"></i> Reservations</a>
                 <a class="nav-link" id="v-pills-reports-tab" data-toggle="pill" href="#v-pills-reports" role="tab" aria-controls="v-pills-reports" aria-selected="false"><i class="fa fa-chart-line mr-2"></i> Reports</a>
                 <a class="nav-link" id="v-pills-payments-tab" data-toggle="pill" href="#v-pills-payments" role="tab" aria-controls="v-pills-payments" aria-selected="false"><i class="fa fa-dollar-sign mr-2"></i> Payments</a>
+                <a class="nav-link" id="v-pills-support-tab" data-toggle="pill" href="#v-pills-support" role="tab" aria-controls="v-pills-support" aria-selected="false"><i class="fa fa-headset mr-2"></i> Support Tickets</a>
             </div>
         </div>
         <div class="col-md-10 content-area">
@@ -280,6 +281,35 @@
                     </div>
                 </div>
 
+                <!-- Support Tickets Section -->
+                <div class="tab-pane fade" id="v-pills-support" role="tabpanel" aria-labelledby="v-pills-support-tab">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3>Support Ticket Management</h3>
+                        <button class="btn btn-sm btn-primary" onclick="fetchSupportTickets()"><i class="fa fa-sync"></i> Refresh</button>
+                    </div>
+                    <div class="card">
+                        <div class="card-body p-0">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>User</th>
+                                        <th>Category</th>
+                                        <th>Subject</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Screenshot</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="supportTicketsTableBody">
+                                    <!-- Support tickets will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
     </div>
@@ -380,6 +410,8 @@
             } else if (e.target.id === 'v-pills-payments-tab') {
                 loadPayments();
                 loadPaymentStats();
+            } else if (e.target.id === 'v-pills-support-tab') {
+                fetchSupportTickets();
             }
         });
     });
@@ -690,6 +722,97 @@
                 document.getElementById('totalRefunds').innerText = '$' + (stats.totalRefunds || 0).toFixed(2);
                 document.getElementById('pendingPayments').innerText = stats.pendingPayments || 0;
             });
+    }
+
+    // --- Support Ticket Management ---
+
+    function fetchSupportTickets() {
+        fetch('/api/admin/support/requests')
+            .then(res => res.json())
+            .then(tickets => {
+                const tbody = document.getElementById('supportTicketsTableBody');
+                tbody.innerHTML = '';
+                
+                if (tickets.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="8" class="text-center text-muted">No support tickets found.</td></tr>';
+                    return;
+                }
+                
+                tickets.forEach(ticket => {
+                    let statusBadge = 'secondary';
+                    if (ticket.status === 'OPEN') statusBadge = 'danger';
+                    else if (ticket.status === 'IN_PROGRESS') statusBadge = 'warning';
+                    else if (ticket.status === 'RESOLVED') statusBadge = 'success';
+                    else if (ticket.status === 'CLOSED') statusBadge = 'info';
+
+                    const screenshotLink = ticket.screenshotUrl 
+                        ? `<a href="${ticket.screenshotUrl}" target="_blank" class="btn btn-sm btn-outline-info"><i class="fa fa-image"></i></a>`
+                        : '-';
+
+                    const row = `
+                        <tr>
+                            <td>${ticket.id}</td>
+                            <td>${ticket.user.username}</td>
+                            <td><span class="badge badge-secondary">${ticket.category}</span></td>
+                            <td>${ticket.subject}</td>
+                            <td><span class="badge badge-${statusBadge}">${ticket.status.replace('_', ' ')}</span></td>
+                            <td>${new Date(ticket.createdAt).toLocaleDateString()}</td>
+                            <td>${screenshotLink}</td>
+                            <td>
+                                <select class="form-control form-control-sm" onchange="updateTicketStatus(${ticket.id}, this.value)">
+                                    <option value="">Update Status...</option>
+                                    <option value="OPEN" ${ticket.status === 'OPEN' ? 'selected' : ''}>Open</option>
+                                    <option value="IN_PROGRESS" ${ticket.status === 'IN_PROGRESS' ? 'selected' : ''}>In Progress</option>
+                                    <option value="RESOLVED" ${ticket.status === 'RESOLVED' ? 'selected' : ''}>Resolved</option>
+                                    <option value="CLOSED" ${ticket.status === 'CLOSED' ? 'selected' : ''}>Closed</option>
+                                </select>
+                            </td>
+                        </tr>
+                    `;
+                    tbody.innerHTML += row;
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching support tickets:', error);
+                alert('Failed to load support tickets');
+            });
+    }
+
+    function updateTicketStatus(requestId, newStatus) {
+        if (!newStatus) return; // User selected placeholder option
+        
+        if (!confirm(`Update ticket #${requestId} to status: ${newStatus.replace('_', ' ')}?`)) {
+            fetchSupportTickets(); // Reload to reset dropdown
+            return;
+        }
+
+        const formData = new URLSearchParams();
+        formData.append('requestId', requestId);
+        formData.append('status', newStatus);
+
+        fetch('/api/admin/support/update-status', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                [csrfHeader]: csrfToken
+            },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (response.success) {
+                alert('Status updated successfully!');
+                fetchSupportTickets(); // Refresh the table
+            } else {
+                alert('Error: ' + response.message);
+                fetchSupportTickets(); // Reload to reset dropdown
+            }
+        })
+        .catch(error => {
+            console.error('Error updating ticket status:', error);
+            alert('Failed to update ticket status');
+            fetchSupportTickets(); // Reload to reset dropdown
+        });
     }
 </script>
 

@@ -39,10 +39,11 @@ public class SecurityConfig {
                 http
                                 .authorizeHttpRequests(authorize -> authorize
                                                 .requestMatchers("/", "/register", "/login", "/privacy", "/css/**",
-                                                                "/js/**", "/images/**",
+                                                                "/js/**", "/images/**", "/uploads/**",
                                                                 "/vehicles", "/api/public/**",
                                                                 "/browse", "/api/reservations/search",
-                                                                "/payment/success", "/payment/cancel")
+                                                                "/payment/success", "/payment/cancel", "/terms",
+                                                                "/about")
                                                 .permitAll()
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())
@@ -54,7 +55,7 @@ public class SecurityConfig {
                                                 .logoutUrl("/logout")
                                                 .logoutSuccessUrl("/login?logout")
                                                 .permitAll())
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservations/**"));
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservations/**", "/api/support/**"));
                 return http.build();
         }
 }
