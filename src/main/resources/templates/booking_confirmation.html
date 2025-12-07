@@ -6,20 +6,31 @@
     <title>Confirm Booking - DriveEase Rentals</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #0b3d91;
             --accent-orange: #ff7b00;
+            --gradient-start: #1e3c72;
+            --gradient-end: #2a5298;
         }
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: #f4f7f6;
         }
         .navbar {
-            background-color: var(--primary-blue);
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
         }
         .navbar-brand {
-            font-weight: bold;
+            font-weight: 700;
+            color: white;
+            font-size: 1.5rem;
+        }
+        .navbar-brand i {
+            margin-right: 8px;
+            color: var(--accent-orange);
         }
         .confirmation-card {
             background: white;
@@ -48,12 +59,35 @@
             font-size: 2rem;
             font-weight: bold;
         }
+        /* Global button theme overrides */
+        .btn-primary {
+            background-color: var(--accent-orange);
+            border-color: var(--accent-orange);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #ff6500;
+            border-color: #ff6500;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
+            color: white;
+        }
+        .btn-primary:focus,
+        .btn-primary:active {
+            background-color: #ff6500;
+            border-color: #ff6500;
+            color: white;
+        }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark">
-    <a class="navbar-brand" href="/"><i class="fa fa-car-side"></i> DriveEase</a>
+    <a class="navbar-brand" href="/">
+        <i class="fa fa-car-side"></i>DriveEase
+    </a>
 </nav>
 
 <div class="container mb-5">

@@ -20,4 +20,9 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findOverdueReservations(
             @org.springframework.data.repository.query.Param("today") java.time.LocalDate today,
             @org.springframework.data.repository.query.Param("statuses") List<com.example.web_based_vehicle_rental.model.ReservationStatus> statuses);
+
+    @org.springframework.data.jpa.repository.Query("SELECT r FROM Reservation r WHERE r.endDate < :today AND r.status = :status")
+    List<Reservation> findExpiredReservationsByStatus(
+            @org.springframework.data.repository.query.Param("today") java.time.LocalDate today,
+            @org.springframework.data.repository.query.Param("status") com.example.web_based_vehicle_rental.model.ReservationStatus status);
 }

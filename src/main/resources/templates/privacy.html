@@ -4,19 +4,20 @@
   <title>Privacy Policy</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary-blue: #007bff;
-      --primary-blue-dark: #0056b3;
-      --accent-orange: #ff8c42;
-      --bg-light: #f9fafb;
-      --text-dark: #2d3748;
-      --error-red: #e53e3e;
+      --primary-blue: #0b3d91;
+      --accent-orange: #ff7b00;
+      --gradient-start: #1e3c72;
+      --gradient-end: #2a5298;
+      --text-dark: #1a1a1a;
+      --bg-light: #f8f9fa;
     }
 
     body {
-      background: linear-gradient(135deg, #e9fdf1, #ffffff);
-      font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+      background: linear-gradient(135deg, #e7f1ff, #ffffff);
+      font-family: 'Inter', sans-serif;
       color: var(--text-dark);
       min-height: 100vh;
       display: flex;
@@ -25,22 +26,44 @@
 
     /* Navbar */
     .navbar {
-      background: white;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-      padding: 0.8rem 2rem;
+      background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+      box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+      padding: 1rem ;
     }
     .navbar-brand {
-      font-weight: bold;
-      color: var(--primary-green);
-      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      font-size: 1.5rem;
+    }
+    .navbar-brand i {
+      color: var(--accent-orange);
+      margin-right: 2px;
     }
     .navbar-nav .nav-link {
       color: var(--text-dark);
-      font-weight: 500;
-      margin-left: 1rem;
+      font-weight: 200;
+      margin-left: 0rem;
     }
     .navbar-nav .nav-link:hover {
       color: var(--accent-orange);
+    }
+
+    .btn-nav {
+      background-color: var(--accent-orange);
+      color: white !important;
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      border: 2px solid var(--accent-orange);
+    }
+
+    .btn-nav:hover {
+      background-color: #ff6500;
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
+      color: white !important;
+      text-decoration: none;
     }
 
     /* Container */
@@ -152,11 +175,9 @@
 </head>
 <body>
 <nav class="navbar">
-  <a class="navbar-brand" href="/"><i class="fa fa-car mr-2"></i>Vehicle Rental</a>
-  <div class="navbar-nav ml-auto">
-    <a class="nav-link" th:href="@{/register}" href="/register"><i class="fa fa-user-plus mr-2"></i>Register</a>
-    <a class="nav-link" th:href="@{/login}" href="/login"><i class="fa fa-sign-in-alt mr-2"></i>Login</a>
-  </div>
+  <a class="navbar-brand" href="/">
+    <i class="fa fa-car-side mr-2"></i>DriveEase
+  </a>
 </nav>
 
 <div class="container">

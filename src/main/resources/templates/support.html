@@ -6,20 +6,67 @@
     <title>Support - DriveEase Rentals</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #0b3d91;
             --accent-orange: #ff7b00;
+            --gradient-start: #1e3c72;
+            --gradient-end: #2a5298;
         }
         body {
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: #f4f7f6;
         }
         .navbar {
-            background-color: var(--primary-blue);
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
         }
         .navbar-brand, .nav-link {
             color: white !important;
+            font-weight: 500;
+        }
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .navbar-brand i {
+            margin-right: 8px;
+            color: var(--accent-orange);
+        }
+        .btn-nav {
+            background-color: transparent;
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            margin: 0 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-nav:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+            text-decoration: none;
+        }
+        .btn-logout {
+            background-color: var(--accent-orange);
+            color: white !important;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid var(--accent-orange);
+            margin-left: 5px;
+        }
+        .btn-logout:hover {
+            background-color: #ff6500;
+            border-color: #ff6500;
+            color: white !important;
+            text-decoration: none;
         }
         .content-wrapper {
             max-width: 900px;
@@ -71,12 +118,15 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark">
-    <a class="navbar-brand" href="/"><i class="fa fa-car-side"></i> DriveEase</a>
-    <div class="ml-auto">
-        <a class="nav-link d-inline" href="/user/dashboard"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
-        <a class="nav-link d-inline" href="/profile"><i class="fa fa-user"></i> Profile</a>
+    <a class="navbar-brand" href="/">
+        <i class="fa fa-car-side"></i>DriveEase
+    </a>
+    <div class="ml-auto d-flex align-items-center">
+        <a class="btn btn-nav" href="/user/dashboard"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
+        <a class="btn btn-nav" href="/browse"><i class="fa fa-car mr-1"></i>Browse Vehicles</a>
+        <a class="btn btn-nav" href="/profile"><i class="fa fa-user mr-1"></i>Profile</a>
         <form th:action="@{/logout}" method="post" class="d-inline">
-            <button type="submit" class="btn btn-light btn-sm">Logout</button>
+            <button type="submit" class="btn btn-logout"><i class="fa fa-sign-out-alt mr-1"></i>Logout</button>
         </form>
     </div>
 </nav>

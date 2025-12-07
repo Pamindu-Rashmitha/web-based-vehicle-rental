@@ -6,20 +6,55 @@
     <title>My Rentals - DriveEase Rentals</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary-blue: #0b3d91;
             --accent-orange: #ff7b00;
+            --gradient-start: #1e3c72;
+            --gradient-end: #2a5298;
+            --text-dark: #1a1a1a;
+            --text-light: #fff;
+            --bg-light: #f8f9fa;
         }
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-light);
         }
         .navbar {
-            background-color: var(--primary-blue);
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
         }
         .navbar-brand {
-            font-weight: bold;
+            font-weight: 700;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+        .navbar-brand i {
+            margin-right: 8px;
+            color: var(--accent-orange);
+        }
+        .btn-outline-light {
+            color: white;
+            border-color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-light:hover {
+            background-color: var(--accent-orange);
+            border-color: var(--accent-orange);
+            color: white;
+        }
+        .btn-light {
+            background-color: var(--accent-orange);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        .btn-light:hover {
+            background-color: #ff6500;
         }
         .rentals-container {
             background: white;
@@ -40,27 +75,83 @@
             font-weight: 500;
         }
         .nav-tabs .nav-link.active {
-            color: var(--primary-blue);
+            color: var(--accent-orange);
             font-weight: bold;
-            border-bottom: 4px solid var(--primary-blue);
+            border-bottom: 4px solid var(--accent-orange);
         }
         .badge-completed { background-color: #28a745; }
         .badge-cancelled { background-color: #dc3545; }
         .text-strike { text-decoration: line-through; color: #999; }
         img.vehicle-img { background: #f8f9fa; }
-  img:not([src]) { visibility: hidden; }
+        img:not([src]) { visibility: hidden; }
+        /* Global button theme overrides */
+        .btn-primary {
+            background-color: var(--accent-orange);
+            border-color: var(--accent-orange);
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #ff6500;
+            border-color: #ff6500;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
+            color: white;
+        }
+        .btn-primary:focus,
+        .btn-primary:active {
+            background-color: #ff6500;
+            border-color: #ff6500;
+            color: white;
+        }
+         .btn-nav {
+            background-color: transparent;
+            color: white !important;
+            padding: 8px 16px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            margin: 0 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-nav:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white !important;
+            text-decoration: none;
+        }
+        .btn-logout {
+            background-color: var(--accent-orange);
+            color: white !important;
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: 2px solid var(--accent-orange);
+            margin-left: 5px;
+        }
+        .btn-logout:hover {
+            background-color: #ff6500;
+            border-color: #ff6500;
+            color: white !important;
+            text-decoration: none;
+        }
     </style>
 </head>
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-dark">
-    <a class="navbar-brand" href="/"><i class="fa fa-car-side"></i> DriveEase</a>
-    <div class="ml-auto">
-        <a href="/browse" class="btn btn-outline-light btn-sm mr-2">Browse Vehicles</a>
-        <a href="/profile" class="btn btn-outline-light btn-sm mr-2">Profile</a>
-        <a href="/support" class="btn btn-outline-light btn-sm mr-2">Support</a>
+    <a class="navbar-brand" href="/">
+        <i class="fa fa-car-side"></i>DriveEase
+    </a>
+    <div class="ml-auto d-flex align-items-center">
+        <a class="btn btn-nav" href="/browse"><i class="fa fa-car mr-1"></i>Browse Vehicles</a>
+        <a class="btn btn-nav" href="/profile"><i class="fa fa-user mr-1"></i>Profile</a>
+        <a class="btn btn-nav" href="/support"><i class="fa fa-headset mr-1"></i>Support</a>
         <form th:action="@{/logout}" method="post" class="d-inline">
-            <button type="submit" class="btn btn-light btn-sm">Logout</button>
+            <button type="submit" class="btn btn-logout"><i class="fa fa-sign-out-alt mr-1"></i>Logout</button>
         </form>
     </div>
 </nav>
@@ -169,8 +260,9 @@
                                 <td th:replace="~{::dateCell}"></td>
                                 <td class="font-weight-bold text-success" th:text="'$' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
                                 <td>
-                                    <span th:class="'badge ' + (${r.status == 'COMPLETED'} ? 'badge-success' : 'badge-secondary')"
-                                          th:text="${r.status}">Status</span>
+                                    <span th:if="${r.status.name() == 'COMPLETED'}" class="badge badge-success" th:text="${r.status}">COMPLETED</span>
+                                    <span th:if="${r.status.name() == 'CANCELLED'}" class="badge badge-danger" th:text="${r.status}">CANCELLED</span>
+                                    <span th:if="${r.status.name() != 'COMPLETED' and r.status.name() != 'CANCELLED'}" class="badge badge-secondary" th:text="${r.status}">Status</span>
                                 </td>
                             </tr>
                         </tbody>

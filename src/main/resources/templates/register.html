@@ -4,19 +4,22 @@
     <title>Register - DriveEase Rentals</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-blue: #007bff;
-            --primary-blue-dark: #0056b3;
-            --accent-yellow: #ffcc00;
-            --bg-light: #f4f9ff;
-            --text-dark: #1f2937;
+            --primary-blue: #0b3d91;
+            --accent-orange: #ff7b00;
+            --gradient-start: #1e3c72;
+            --gradient-end: #2a5298;
+            --text-dark: #1a1a1a;
+            --text-light: #fff;
+            --bg-light: #f8f9fa;
             --error-red: #e53e3e;
         }
 
         body {
             background: linear-gradient(135deg, #e7f1ff, #ffffff);
-            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             color: var(--text-dark);
             min-height: 100vh;
             display: flex;
@@ -25,14 +28,19 @@
 
         /* Navbar */
         .navbar {
-            background: white;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-            padding: 0.8rem 2rem;
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
         }
         .navbar-brand {
-            font-weight: bold;
-            color: var(--primary-blue);
-            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-light);
+            font-size: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+        .navbar-brand i {
+            margin-right: 8px;
+            color: var(--accent-orange);
         }
 
         /* Container */
@@ -118,7 +126,7 @@
             display: inline;
         }
         .form-group.checkbox-group a {
-            color: var(--accent-yellow) !important;
+            color: var(--accent-orange) !important;
             font-weight: 500;
             text-decoration: none;
             cursor: pointer;
@@ -126,7 +134,7 @@
         }
         .form-group.checkbox-group a:hover {
             text-decoration: underline !important;
-            color: #ffb400 !important;
+            color: #ff6500 !important;
         }
 
         /* Privacy link */
@@ -136,13 +144,13 @@
             display: block;
         }
         .privacy-link a {
-            color: var(--accent-yellow);
+            color: var(--accent-orange);
             font-weight: 500;
             text-decoration: none;
         }
         .privacy-link a:hover {
             text-decoration: underline;
-            color: #ffb400;
+            color: #ff6500;
         }
 
         /* Password toggle */
@@ -161,21 +169,23 @@
         /* Button */
         button[type="submit"] {
             width: 100%;
-            background: linear-gradient(90deg, var(--primary-blue), var(--primary-blue-dark));
+            background: var(--accent-orange);
             color: #fff;
             border: none;
-            border-radius: 12px;
-            padding: 14px 0;
+            border-radius: 50px;
+            padding: 15px 0;
             font-size: 1.1rem;
-            font-weight: 600;
+            font-weight: 700;
             margin-top: 16px;
-            transition: all 0.25s ease-in-out;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 10px 30px rgba(255, 123, 0, 0.4);
         }
         button[type="submit"]:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(0,123,255,0.25);
+            background-color: #ff6500;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(255, 123, 0, 0.5);
         }
 
         /* Ripple effect */
@@ -220,13 +230,13 @@
             font-size: 1rem;
         }
         a {
-            color: var(--accent-yellow);
+            color: var(--accent-orange);
             font-weight: 500;
             text-decoration: none;
         }
         a:hover {
             text-decoration: underline;
-            color: #ffb400;
+            color: #ff6500;
         }
 
         /* Responsive */
@@ -240,7 +250,9 @@
 </head>
 <body>
 <nav class="navbar">
-    <a class="navbar-brand" href="/">DriveEase Rentals</a>
+    <a class="navbar-brand" href="/">
+        <i class="fa fa-car-side"></i>DriveEase
+    </a>
 </nav>
 
 <div class="container">
