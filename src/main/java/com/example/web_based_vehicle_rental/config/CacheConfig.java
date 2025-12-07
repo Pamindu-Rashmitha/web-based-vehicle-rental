@@ -6,6 +6,8 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.lang.NonNull;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -38,11 +40,14 @@ public class CacheConfig {
      * - Expire after 5 minutes of write
      * - Expire after 10 minutes of access
      */
+    @NonNull
     private Caffeine<Object, Object> caffeineCacheBuilder() {
-        return Caffeine.newBuilder()
-                .maximumSize(1000)
-                .expireAfterWrite(5, TimeUnit.MINUTES)
-                .expireAfterAccess(10, TimeUnit.MINUTES)
-                .recordStats(); // Enable cache statistics
+        return Objects.requireNonNull(
+                Caffeine.newBuilder()
+                        .maximumSize(1000)
+                        .expireAfterWrite(5, TimeUnit.MINUTES)
+                        .expireAfterAccess(10, TimeUnit.MINUTES)
+                        .recordStats() // Enable cache statistics
+        );
     }
 }
