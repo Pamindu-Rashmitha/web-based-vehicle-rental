@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header .logo {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .logo-icon {
+            color: #ff7b00;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            color: #1e3c72;
+            margin-top: 0;
+        }
+        .content p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .booking-details {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .booking-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .booking-details td {
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .booking-details td:first-child {
+            font-weight: bold;
+            color: #1e3c72;
+        }
+        .booking-details td:last-child {
+            text-align: right;
+        }
+        .total {
+            font-size: 20px;
+            color: #ff7b00;
+            font-weight: bold;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #ff7b00;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">
+                <span class="logo-icon">🚗</span> DriveEase
+            </div>
+            <h1>Booking Confirmed!</h1>
+        </div>
+        <div class="content">
+            <h2>Great news, <span th:text="${username}">User</span>!</h2>
+            <p>Your vehicle booking has been <strong>confirmed</strong>. We can't wait to serve you!</p>
+            
+            <div class="booking-details">
+                <h3 style="margin-top: 0; color: #1e3c72;">Booking Details</h3>
+                <table>
+                    <tr>
+                        <td>Vehicle:</td>
+                        <td th:text="${vehicleName}">Vehicle Name</td>
+                    </tr>
+                    <tr>
+                        <td>Pickup Date:</td>
+                        <td th:text="${startDate}">Start Date</td>
+                    </tr>
+                    <tr>
+                        <td>Return Date:</td>
+                        <td th:text="${endDate}">End Date</td>
+                    </tr>
+                    <tr style="border-bottom: none;">
+                        <td>Total Amount:</td>
+                        <td class="total" th:text="${totalPrice}">$0.00</td>
+                    </tr>
+                </table>
+            </div>
+            
+            <p><strong>What's Next?</strong></p>
+            <ul style="color: #555;">
+                <li>You'll receive a reminder 24 hours before pickup</li>
+                <li>Bring your driver's license and booking confirmation</li>
+                <li>Contact support if you need to modify your booking</li>
+            </ul>
+        </div>
+        <div class="footer">
+            <p>© 2024 DriveEase. All rights reserved.</p>
+            <p><a href="#">View Booking</a> | <a href="#">Contact Support</a></p>
+        </div>
+    </div>
+</body>
+</html>

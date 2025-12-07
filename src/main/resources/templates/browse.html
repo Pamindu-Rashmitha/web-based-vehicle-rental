@@ -109,7 +109,6 @@
             font-weight: bold;
             font-size: 1.2rem;
         }
-        /* Global button theme overrides */
         .btn-primary {
             background-color: var(--accent-orange);
             border-color: var(--accent-orange);
@@ -129,6 +128,9 @@
             background-color: #ff6500;
             border-color: #ff6500;
             color: white;
+        }
+        .modal-lg {
+            max-width: 900px;
         }
     </style>
 </head>
@@ -193,44 +195,41 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // CSRF setup (only needed for POST/PUT/DELETE, but safe to have)
     const csrfToken = document.querySelector("meta[name='_csrf']")?.getAttribute("content");
     const csrfHeader = document.querySelector("meta[name='_csrf_header']")?.getAttribute("content");
 
-    // Load vehicles when page is ready
     document.addEventListener('DOMContentLoaded', () => {
         loadAllVehicles();
     });
 
     function loadAllVehicles() {
-    fetch('/api/vehicles', {
-        credentials: 'include',  
-        headers: { 'Accept': 'application/json' }
-    })
-    .then(response => {
-        if (!response.ok) {
-            // Show actual HTML error in console for debugging
-            response.text().then(text => {
-                console.error('Server returned HTML (not JSON):', text.substring(0, 500));
-            });
-            throw new Error(`HTTP ${response.status}`);
-        }
-        return response.json();
-    })
-    .then(vehicles => {
-        if (!Array.isArray(vehicles)) throw new Error('Not an array');
-        displayVehicles(vehicles);
-    })
-    .catch(error => {
-        console.error('Load failed:', error);
-        document.getElementById('resultsArea').innerHTML = `
-            <div class="col-12 text-center text-danger py-5">
-                <h5>Cannot load vehicles</h5>
-                <p>${error.message}</p>
-                <small>Most likely cause: you are not logged in or the API requires authentication.</small>
-            </div>`;
-    });
-}
+        fetch('/api/vehicles', {
+            credentials: 'include',  
+            headers: { 'Accept': 'application/json' }
+        })
+        .then(response => {
+            if (!response.ok) {
+                response.text().then(text => {
+                    console.error('Server returned HTML (not JSON):', text.substring(0, 500));
+                });
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(vehicles => {
+            if (!Array.isArray(vehicles)) throw new Error('Not an array');
+            displayVehicles(vehicles);
+        })
+        .catch(error => {
+            console.error('Load failed:', error);
+            document.getElementById('resultsArea').innerHTML = `
+                <div class="col-12 text-center text-danger py-5">
+                    <h5>Cannot load vehicles</h5>
+                    <p>${error.message}</p>
+                    <small>Most likely cause: you are not logged in or the API requires authentication.</small>
+                </div>`;
+        });
+    }
 
     function displayVehicles(vehicles) {
         const resultsArea = document.getElementById('resultsArea');
@@ -254,7 +253,7 @@
                                 <span class="badge badge-secondary ml-1">${vehicle.year || 'N/A'}</span>
                             </p>
                             <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <span class="price-tag">$${Number(vehicle.dailyPrice).toFixed(2)}/day</span>
+                                <span class="price-tag">LKR ${Number(vehicle.dailyPrice).toFixed(2)}/day</span>
                                 <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); showBookingOptions(${vehicle.id})">
                                     Book Now
                                 </button>
@@ -267,7 +266,6 @@
         });
     }
 
-    // Simple HTML escape to prevent XSS when injecting data
     function escapeHtml(text) {
         if (!text) return '';
         return String(text).replace(/[&<>"']/g, match => ({
@@ -275,7 +273,6 @@
         })[match]);
     }
 
-    // Search form handler
     document.getElementById('searchForm').addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -313,7 +310,6 @@
             });
     });
 
-    // Show detailed modal
     function showVehicleDetails(vehicleId) {
         fetch(`/api/vehicles/${vehicleId}`, {
             headers: { 'Accept': 'application/json' }
@@ -330,7 +326,6 @@
     }
 
     function displayVehicleModal(vehicle) {
-        // Normalize images array
         let images = [];
         if (vehicle.images && Array.isArray(vehicle.images) && vehicle.images.length > 0) {
             images = vehicle.images.map(img => 
@@ -395,13 +390,42 @@
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between">
                                         <strong>Price per day</strong>
-                                        <span class="price-tag">$${Number(vehicle.dailyPrice || 0).toFixed(2)}</span>
+                                        <span class="price-tag">LKR ${Number(vehicle.dailyPrice || 0).toFixed(2)}</span>
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between">
                                         <strong>License Plate</strong>
                                         <span>${escapeHtml(vehicle.licensePlate || 'N/A')}</span>
                                     </li>
                                 </ul>
+                            </div>
+                            
+                            <!-- Reviews Section -->
+                            <div id="vehicleReviews" style="margin-top: 30px;">
+                                <h6 style="color: var(--primary-blue); margin-bottom: 20px;">
+                                    <i class="fa fa-star mr-2"></i>Customer Reviews
+                                </h6>
+                                
+                                <!-- Rating Summary -->
+                                <div id="ratingSummary" style="display: none; background: #f8f9fa; padding: 20px; border-radius: 10px; margin-bottom: 20px;">
+                                    <div style="display: flex; align-items: center; gap: 20px;">
+                                        <div style="text-align: center;">
+                                            <div id="avgRating" style="font-size: 2.5rem; font-weight: 700; color: var(--accent-orange);">0.0</div>
+                                            <div id="avgStars" style="color: var(--accent-orange); font-size: 1.2rem;"></div>
+                                            <div id="totalReviews" style="color: #666; font-size: 0.9rem;">0 reviews</div>
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <div id="ratingBars"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Reviews List -->
+                                <div id="reviewsList">
+                                    <div style="text-align: center; padding: 20px; color: #999;">
+                                        <i class="fa fa-comment-slash fa-2x mb-2" style="color: #ddd;"></i>
+                                        <p>No reviews yet</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -414,15 +438,15 @@
                 </div>
             </div>`;
 
-        // Remove old modal
         const old = document.getElementById('vehicleDetailModal');
         if (old) old.remove();
 
-        // Inject and show
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         $('#vehicleDetailModal').modal('show');
+        
+        // Load reviews when modal opens
+        loadVehicleReviews(vehicle.id);
 
-        // Clean up when hidden
         $('#vehicleDetailModal').on('hidden.bs.modal', function () {
             $(this).remove();
         });
@@ -439,6 +463,106 @@
         }
 
         window.location.href = `/booking/confirm?vehicleId=${vehicleId}&startDate=${startDate}&endDate=${endDate}`;
+    }
+    
+    // ========== REVIEWS FUNCTIONS ==========
+    
+    async function loadVehicleReviews(vehicleId) {
+        try {
+            const response = await fetch(`/api/reviews/vehicle/${vehicleId}`);
+            const data = await response.json();
+            
+            if (data.statistics && data.statistics.totalReviews > 0) {
+                displayRatingSummary(data.statistics);
+                displayReviewsList(data.reviews);
+            }
+        } catch (error) {
+            console.error('Error loading reviews:', error);
+        }
+    }
+    
+    function displayRatingSummary(stats) {
+        document.getElementById('ratingSummary').style.display = 'block';
+        document.getElementById('avgRating').textContent = stats.averageRating.toFixed(1);
+        document.getElementById('avgStars').innerHTML = generateStars(stats.averageRating);
+        document.getElementById('totalReviews').textContent = `${stats.totalReviews} review${stats.totalReviews !== 1 ? 's' : ''}`;
+        
+        const total = stats.totalReviews;
+        let barsHTML = '';
+        const ratings = [
+            { stars: 5, count: stats.fiveStars },
+            { stars: 4, count: stats.fourStars },
+            { stars: 3, count: stats.threeStars },
+            { stars: 2, count: stats.twoStars },
+            { stars: 1, count: stats.oneStar }
+        ];
+        
+        ratings.forEach(r => {
+            const percent = total > 0 ? (r.count / total) * 100 : 0;
+            barsHTML += `
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 5px;">
+                    <span style="min-width: 50px; font-size: 0.85rem; color: #666;">${r.stars} star${r.stars > 1 ? 's' : ''}</span>
+                    <div style="flex: 1; height: 6px; background: #e0e0e0; border-radius: 10px; overflow: hidden;">
+                        <div style="height: 100%; background: var(--accent-orange); width: ${percent}%;"></div>
+                    </div>
+                    <span style="min-width: 30px; text-align: right; font-size: 0.8rem; color: #999;">${r.count}</span>
+                </div>
+            `;
+        });
+        
+        document.getElementById('ratingBars').innerHTML = barsHTML;
+    }
+    
+    function displayReviewsList(reviews) {
+        if (reviews.length === 0) return;
+        
+        const reviewsHTML = reviews.map(review => `
+            <div style="border-bottom: 1px solid #e0e0e0; padding: 15px 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div>
+                        <span style="font-weight: 600; color: var(--primary-blue);">
+                            <i class="fa fa-user-circle mr-1"></i>${escapeHtml(review.user.username)}
+                        </span>
+                        <span style="color: var(--accent-orange); margin-left: 10px;">${generateStars(review.rating)}</span>
+                    </div>
+                    <span style="color: #999; font-size: 0.85rem;">${formatReviewDate(review.createdDate)}</span>
+                </div>
+                <div style="color: #333; line-height: 1.5; margin-top: 8px;">${escapeHtml(review.comment || 'No comment provided.')}</div>
+            </div>
+        `).join('');
+        
+        document.getElementById('reviewsList').innerHTML = reviewsHTML;
+    }
+    
+    function generateStars(rating) {
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = rating % 1 >= 0.5;
+        let stars = '';
+        
+        for (let i = 0; i < fullStars; i++) {
+            stars += '<i class="fas fa-star"></i>';
+        }
+        if (hasHalfStar) {
+            stars += '<i class="fas fa-star-half-alt"></i>';
+        }
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        for (let i = 0; i < emptyStars; i++) {
+            stars += '<i class="far fa-star"></i>';
+        }
+        return stars;
+    }
+    
+    function formatReviewDate(dateString) {
+        const date = new Date(dateString);
+        const now = new Date();
+        const diffMs = now - date;
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+        
+        if (diffDays === 0) return 'Today';
+        if (diffDays === 1) return 'Yesterday';
+        if (diffDays < 7) return `${diffDays} days ago`;
+        if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+        return date.toLocaleDateString();
     }
 </script>
 

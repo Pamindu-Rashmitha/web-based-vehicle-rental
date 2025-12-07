@@ -207,7 +207,7 @@
                                 <span class="badge badge-secondary ml-1">${vehicle.year || 'N/A'}</span>
                             </p>
                             <div class="mt-auto d-flex justify-content-between align-items-center">
-                                <span class="price-tag">$${Number(vehicle.dailyPrice).toFixed(2)}/day</span>
+                                <span class="price-tag">LKR ${Number(vehicle.dailyPrice).toFixed(2)}/day</span>
                                 <span class="badge badge-${vehicle.status === 'AVAILABLE' ? 'success' : 'warning'}">
                                     ${escapeHtml(vehicle.status || 'UNKNOWN')}
                                 </span>
@@ -337,7 +337,7 @@
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between">
                                         <strong>Price per day</strong>
-                                        <span class="price-tag">$${Number(vehicle.dailyPrice || 0).toFixed(2)}</span>
+                                        <span class="price-tag">LKR ${Number(vehicle.dailyPrice || 0).toFixed(2)}</span>
                                     </li>
                                 </ul>
                             </div>

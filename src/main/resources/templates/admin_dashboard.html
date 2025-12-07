@@ -204,6 +204,7 @@
                                         <th>Dates</th>
                                         <th>Total</th>
                                         <th>Status</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="reservationsTableBody">
@@ -270,7 +271,7 @@
                             <div class="card text-white bg-success">
                                 <div class="card-body">
                                     <h6 class="card-title">Total Revenue</h6>
-                                    <h3 class="mb-0" id="totalRevenue">$0.00</h3>
+                                    <h3 class="mb-0" id="totalRevenue">LKR 0.00</h3>
                                 </div>
                             </div>
                         </div>
@@ -278,7 +279,7 @@
                             <div class="card text-white bg-warning">
                                 <div class="card-body">
                                     <h6 class="card-title">Total Refunds</h6>
-                                    <h3 class="mb-0" id="totalRefunds">$0.00</h3>
+                                    <h3 class="mb-0" id="totalRefunds">LKR 0.00</h3>
                                 </div>
                             </div>
                         </div>
@@ -517,7 +518,7 @@
                             <td>${vehicle.model}</td>
                             <td>${vehicle.year}</td>
                             <td>${vehicle.licensePlate}</td>
-                            <td>$${vehicle.dailyPrice}</td>
+                            <td>LKR ${vehicle.dailyPrice}</td>
                             <td>${vehicle.type}</td>
                             <td><span class="badge badge-${statusBadge}">${vehicle.status}</span></td>
                             <td>${vehicle.imageUrl ? `<img src="${vehicle.imageUrl}" class="vehicle-img-thumb">` : '-'}</td>
@@ -615,8 +616,13 @@
                             <td>${r.user.username}</td>
                             <td>${r.vehicle.brand} ${r.vehicle.model}</td>
                             <td>${r.startDate} to ${r.endDate}</td>
-                            <td>$${r.totalPrice}</td>
+                            <td>LKR ${r.totalPrice}</td>
                             <td><span class="badge badge-${statusBadge}">${r.status}</span></td>
+                            <td>
+                                <a href="/api/invoices/${r.id}/download" class="btn btn-sm btn-primary btn-action" download>
+                                    <i class="fa fa-download"></i> Invoice
+                                </a>
+                            </td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
@@ -649,7 +655,7 @@
                     data: {
                         labels: labels,
                         datasets: [{
-                            label: 'Revenue ($)',
+                            label: 'Revenue (LKR)',
                             data: values,
                             backgroundColor: 'rgba(11, 61, 145, 0.7)',
                             borderColor: 'rgba(11, 61, 145, 1)',
@@ -703,7 +709,7 @@
                             <td>${r.user.username}</td>
                             <td>${r.vehicle.brand} ${r.vehicle.model}</td>
                             <td class="text-danger font-weight-bold">${r.endDate}</td>
-                            <td>$${r.totalPrice}</td>
+                            <td>LKR ${r.totalPrice}</td>
                         </tr>
                     `;
                     tbody.innerHTML += row;
@@ -736,9 +742,9 @@
                         <tr>
                             <td>${p.id}</td>
                             <td>#${p.reservation?.id || 'N/A'}</td>
-                            <td>$${p.amount.toFixed(2)}</td>
+                            <td>LKR ${p.amount.toFixed(2)}</td>
                             <td><span class="badge badge-${statusBadge}">${p.status}</span></td>
-                            <td>${p.refundAmount ? '$' + p.refundAmount.toFixed(2) : '-'}</td>
+                            <td>${p.refundAmount ? 'LKR ' + p.refundAmount.toFixed(2) : '-'}</td>
                             <td><small>${p.stripePaymentIntentId || 'Pending'}</small></td>
                             <td>${new Date(p.createdAt).toLocaleDateString()}</td>
                         </tr>
@@ -752,8 +758,8 @@
         fetch('/admin/payments/stats')
             .then(res => res.json())
             .then(stats => {
-                document.getElementById('totalRevenue').innerText = '$' + (stats.totalRevenue || 0).toFixed(2);
-                document.getElementById('totalRefunds').innerText = '$' + (stats.totalRefunds || 0).toFixed(2);
+                document.getElementById('totalRevenue').innerText = 'LKR ' + (stats.totalRevenue || 0).toFixed(2);
+                document.getElementById('totalRefunds').innerText = 'LKR ' + (stats.totalRefunds || 0).toFixed(2);
                 document.getElementById('pendingPayments').innerText = stats.pendingPayments || 0;
             });
     }

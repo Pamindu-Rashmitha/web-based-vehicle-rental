@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 30px;
+            text-align: center;
+            color: white;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+        }
+        .header .logo {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .logo-icon {
+            color: #ff7b00;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .content h2 {
+            color: #1e3c72;
+            margin-top: 0;
+        }
+        .content p {
+            color: #555;
+            line-height: 1.6;
+            font-size: 16px;
+        }
+        .verify-button {
+            display: inline-block;
+            background-color: #ff7b00;
+            color: white !important;
+            padding: 15px 40px;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(255, 123, 0, 0.3);
+        }
+        .verify-button:hover {
+            background-color: #ff6500;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+        .footer a {
+            color: #ff7b00;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="header">
+            <div class="logo">
+                <span class="logo-icon">🚗</span> DriveEase
+            </div>
+            <h1>Verify Your Email</h1>
+        </div>
+        <div class="content">
+            <h2>Welcome, <span th:text="${username}">User</span>!</h2>
+            <p>Thank you for registering with DriveEase. We're excited to have you on board!</p>
+            <p>To complete your registration and start renting vehicles, please verify your email address by clicking the button below:</p>
+            <center>
+                <a th:href="${verificationLink}" class="verify-button">Verify Email Address</a>
+            </center>
+            <p style="color: #888; font-size: 14px; margin-top: 30px;">
+                This verification link will expire in 24 hours. If you didn't create an account with DriveEase, please ignore this email.
+            </p>
+            <p style="color: #888; font-size: 14px;">
+                If the button doesn't work, copy and paste this link into your browser:<br>
+                <a th:href="${verificationLink}" th:text="${verificationLink}" style="color: #ff7b00; word-break: break-all;">link</a>
+            </p>
+        </div>
+        <div class="footer">
+            <p>© 2024 DriveEase. All rights reserved.</p>
+            <p><a href="#">Privacy Policy</a> | <a href="#">Terms of Service</a> | <a href="#">Contact Support</a></p>
+        </div>
+    </div>
+</body>
+</html>

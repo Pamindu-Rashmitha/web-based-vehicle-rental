@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Registration Successful - DriveEase</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0b3d91;
+            --accent-orange: #ff7b00;
+            --gradient-start: #1e3c72;
+            --gradient-end: #2a5298;
+        }
+        body {
+            background: linear-gradient(135deg, #e7f1ff, #ffffff);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .success-container {
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 50px;
+            text-align: center;
+            animation: fadeIn 0.7s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .success-icon {
+            font-size: 80px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .email-badge {
+            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 600;
+            margin: 20px 0;
+        }
+        .info-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--accent-orange);
+            padding: 20px;
+            margin: 30px 0;
+            text-align: left;
+        }
+        .info-box h5 {
+            color: var(--primary-blue);
+            margin-bottom: 10px;
+        }
+        .info-box ul {
+            margin-bottom: 0;
+            padding-left: 20px;
+        }
+        .btn-login {
+            background-color: var(--accent-orange);
+            color: white;
+            padding: 12px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            border: none;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            background-color: #ff6500;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 123, 0, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">
+            <i class="fa fa-envelope-circle-check"></i>
+        </div>
+        <h1>Check Your Email!</h1>
+        <p>Your account has been created successfully.</p>
+        
+        <div class="email-badge">
+            <i class="fa fa-envelope mr-2"></i><span th:text="${email}">email@example.com</span>
+        </div>
+        
+        <div class="info-box">
+            <h5><i class="fa fa-info-circle mr-2"></i>Next Steps:</h5>
+            <ul>
+                <li>We've sent a verification email to your inbox</li>
+                <li>Click the verification link in the email</li>
+                <li>Once verified, you can log in and start booking vehicles</li>
+            </ul>
+        </div>
+        
+        <p style="font-size: 0.9rem; color: #888;">
+            Didn't receive the email? Check your spam folder or <a href="/resend-verification">resend verification email</a>.
+        </p>
+        
+        <a href="/login" class="btn btn-login">Go to Login</a>
+    </div>
+</body>
+</html>

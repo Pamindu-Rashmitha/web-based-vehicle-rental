@@ -53,7 +53,8 @@ public class UserController {
 
         try {
             userService.register(user);
-            return "redirect:/login";
+            model.addAttribute("email", user.getEmail());
+            return "registration_success";
         } catch (IllegalStateException | IllegalArgumentException e) {
             model.addAttribute("error", e.getMessage());
             return "register";

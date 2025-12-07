@@ -38,8 +38,12 @@ public class User implements UserDetails {
     @Column(name = "agreed_to_terms", nullable = false)
     private boolean agreedToTerms;
 
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
+
     public User() {
         this.agreedToTerms = false;
+        this.emailVerified = false;
     }
 
     public Long getId() {
@@ -90,6 +94,14 @@ public class User implements UserDetails {
 
     public void setAgreedToTerms(boolean agreedToTerms) {
         this.agreedToTerms = agreedToTerms;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     @Override

@@ -16,11 +16,14 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
         private final UserRepository userRepository;
         private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+        private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
 
         public SecurityConfig(UserRepository userRepository,
-                        CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler) {
+                        CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
+                        CustomAuthenticationFailureHandler customAuthenticationFailureHandler) {
                 this.userRepository = userRepository;
                 this.customAuthenticationSuccessHandler = customAuthenticationSuccessHandler;
+                this.customAuthenticationFailureHandler = customAuthenticationFailureHandler;
         }
 
         @Bean
@@ -43,19 +46,23 @@ public class SecurityConfig {
                                                                 "/vehicles", "/api/public/**",
                                                                 "/browse", "/api/reservations/search",
                                                                 "/payment/success", "/payment/cancel", "/terms",
-                                                                "/about")
+                                                                "/about", "/verify-email", "/forgot-password",
+                                                                "/reset-password", "/resend-verification",
+                                                                "/registration_success", "/api/reviews/vehicle/**")
                                                 .permitAll()
                                                 .requestMatchers("/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())
                                 .formLogin(form -> form
                                                 .loginPage("/login")
                                                 .successHandler(customAuthenticationSuccessHandler)
+                                                .failureHandler(customAuthenticationFailureHandler)
                                                 .permitAll())
                                 .logout(logout -> logout
                                                 .logoutUrl("/logout")
                                                 .logoutSuccessUrl("/login?logout")
                                                 .permitAll())
-                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservations/**", "/api/support/**"));
+                                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/reservations/**", "/api/support/**",
+                                                "/api/reviews/**"));
                 return http.build();
         }
 }

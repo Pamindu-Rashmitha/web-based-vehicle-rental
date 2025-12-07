@@ -210,44 +210,51 @@
 </nav>
 
 <div class="container">
-    <h1>Login to Your Rental Account</h1>
+    <h1>Welcome Back</h1>
 
-    <!-- Error message -->
     <div th:if="${param.error}" class="error">
-        Invalid username or password. Please try again.
+        <i class="fa fa-exclamation-circle"></i> Invalid username or password. Please try again.
     </div>
-
-    <!-- Logout message -->
     <div th:if="${param.logout}" class="success">
-        You have been logged out successfully.
+        <i class="fa fa-check-circle"></i> You have been logged out successfully.
+    </div>
+    <div th:if="${param.verified}" class="success">
+        <i class="fa fa-check-circle"></i> Email verified successfully! You can now log in.
+    </div>
+    <div th:if="${param.unverified}" class="error">
+        <i class="fa fa-exclamation-circle"></i> Please verify your email before logging in.
     </div>
 
-    <form th:action="@{/login}" method="post" aria-label="Login form">
+    <form th:action="@{/login}" method="post">
         <div class="form-group">
-            <input type="text" id="username" name="username" required placeholder=" " autofocus aria-required="true"/>
-            <label for="username"><i class="fa fa-user mr-2"></i> Username</label>
+            <input type="text" id="username" name="username" required placeholder=" " aria-label="Username"/>
+            <label for="username">Username</label>
         </div>
+
         <div class="form-group">
-            <input type="password" id="password" name="password" required placeholder=" " aria-required="true"/>
-            <label for="password"><i class="fa fa-lock mr-2"></i> Password</label>
-            <i class="fa fa-eye password-toggle" id="togglePassword"></i>
+            <input type="password" id="password" name="password" required placeholder=" " aria-label="Password"/>
+            <label for="password">Password</label>
+            <i class="fa fa-eye password-toggle" id="togglePassword" aria-label="Toggle password visibility"></i>
         </div>
-        <button type="submit"><i class="fa fa-sign-in-alt mr-2"></i>Login</button>
+
+        <button type="submit">Sign In</button>
     </form>
 
-    <p>Don’t have an account? <a th:href="@{/register}" href="/register">Register here</a></p>
+    <p>Don't have an account? <a href="/register">Sign up</a></p>
+    <p><a href="/forgot-password">Forgot Password?</a></p>
 </div>
 
 <script>
-    // Toggle password visibility
     const togglePassword = document.getElementById("togglePassword");
     const passwordField = document.getElementById("password");
 
-    togglePassword.addEventListener("click", () => {
-        const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
-        passwordField.setAttribute("type", type);
-        togglePassword.classList.toggle("fa-eye-slash");
-    });
+    if (togglePassword && passwordField) {
+        togglePassword.addEventListener("click", () => {
+            const type = passwordField.getAttribute("type") === "password" ? "text" : "password";
+            passwordField.setAttribute("type", type);
+            togglePassword.classList.toggle("fa-eye-slash");
+        });
+    }
 </script>
 </body>
 </html>

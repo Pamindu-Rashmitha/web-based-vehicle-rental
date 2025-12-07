@@ -194,7 +194,7 @@
                             <tr th:each="r : ${upcomingReservations}" th:with="vehicle=${r.vehicle}, startDate=${r.startDate}, endDate=${r.endDate}">
                                 <td th:replace="~{::vehicleCell}"></td>
                                 <td th:replace="~{::dateCell}"></td>
-                                <td class="font-weight-bold text-success" th:text="'$' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
+                                <td class="font-weight-bold text-success" th:text="'LKR ' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
                                 <td>
                                     <button class="btn btn-danger btn-sm" th:onclick="'cancelReservation(' + ${r.id} + ')'">
                                         Cancel
@@ -226,7 +226,7 @@
                             <tr th:each="r : ${activeReservations}" th:with="vehicle=${r.vehicle}, startDate=${r.startDate}, endDate=${r.endDate}">
                                 <td th:replace="~{::vehicleCell}"></td>
                                 <td th:replace="~{::dateCell}"></td>
-                                <td class="font-weight-bold text-success" th:text="'$' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
+                                <td class="font-weight-bold text-success" th:text="'LKR ' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" th:onclick="'openExtendModal(' + ${r.id} + ')'">
                                         Extend
@@ -252,17 +252,25 @@
                                 <th>Dates</th>
                                 <th>Total Price</th>
                                 <th>Status</th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr th:each="r : ${pastReservations}" th:with="vehicle=${r.vehicle}, startDate=${r.startDate}, endDate=${r.endDate}">
                                 <td th:replace="~{::vehicleCell}"></td>
                                 <td th:replace="~{::dateCell}"></td>
-                                <td class="font-weight-bold text-success" th:text="'$' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
+                                <td class="font-weight-bold text-success" th:text="'LKR ' + ${#numbers.formatDecimal(r.totalPrice, 1, 2)}"></td>
                                 <td>
                                     <span th:if="${r.status.name() == 'COMPLETED'}" class="badge badge-success" th:text="${r.status}">COMPLETED</span>
                                     <span th:if="${r.status.name() == 'CANCELLED'}" class="badge badge-danger" th:text="${r.status}">CANCELLED</span>
                                     <span th:if="${r.status.name() != 'COMPLETED' and r.status.name() != 'CANCELLED'}" class="badge badge-secondary" th:text="${r.status}">Status</span>
+                                </td>
+                                <td>
+                                    <a th:href="@{/api/invoices/{id}/download(id=${r.id})}" 
+                                       class="btn btn-primary btn-sm"
+                                       download>
+                                        <i class="fa fa-download mr-1"></i>Invoice
+                                    </a>
                                 </td>
                             </tr>
                         </tbody>

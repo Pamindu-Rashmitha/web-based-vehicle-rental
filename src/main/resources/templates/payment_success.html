@@ -132,7 +132,7 @@
         <h2 class="text-success mb-3">Payment Successful!</h2>
         <p class="text-muted mb-4">Your vehicle reservation has been confirmed</p>
         
-        <div class="amount-paid" th:text="'$' + ${payment.amount}">$0.00</div>
+        <div class="amount-paid" th:text="'LKR ' + ${payment.amount}">LKR 0.00</div>
         <small class="text-muted">Amount Paid</small>
         
         <div class="reservation-details" th:if="${reservation}">

@@ -6,6 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "reservation", indexes = {
+        @Index(name = "idx_reservation_user", columnList = "user_id"),
+        @Index(name = "idx_reservation_vehicle", columnList = "vehicle_id"),
+        @Index(name = "idx_reservation_status", columnList = "status"),
+        @Index(name = "idx_reservation_dates", columnList = "start_date, end_date"),
+        @Index(name = "idx_reservation_user_status", columnList = "user_id, status")
+})
 public class Reservation {
 
     @Id

@@ -1,0 +1,438 @@
+<!-- Reviews Section Component -->
+<div id="reviewsSection" style="margin-top: 40px;">
+    <style>
+        .reviews-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        .rating-summary {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 30px;
+        }
+        .rating-score {
+            text-align: center;
+        }
+        .rating-number {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--accent-orange);
+            line-height: 1;
+        }
+        .rating-stars {
+            color: var(--accent-orange);
+            font-size: 1.5rem;
+            margin: 5px 0;
+        }
+        .rating-count {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .rating-breakdown {
+            flex: 1;
+        }
+        .rating-bar-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        .rating-bar-label {
+            min-width: 60px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        .rating-bar-bg {
+            flex: 1;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .rating-bar-fill {
+            height: 100%;
+            background: var(--accent-orange);
+            transition: width 0.3s ease;
+        }
+        .rating-bar-count {
+            min-width: 35px;
+            text-align: right;
+            font-size: 0.85rem;
+            color: #999;
+        }
+        
+        /* Review submission form */
+        .review-form {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            font-size: 2rem;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+        .star-rating i {
+            color: #ddd;
+            transition: color 0.2s;
+        }
+        .star-rating i.active,
+        .star-rating i:hover,
+        .star-rating i:hover ~ i {
+            color: var(--accent-orange);
+        }
+        .review-textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+            min-height: 100px;
+        }
+        .submit-review-btn {
+            background: var(--accent-orange);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .submit-review-btn:hover {
+            background: #ff6500;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
+        }
+        
+        /* Individual reviews */
+        .review-item {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 0;
+        }
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .review-user {
+            font-weight: 600;
+            color: var(--primary-blue);
+        }
+        .review-rating {
+            color: var(--accent-orange);
+        }
+        .review-date {
+            color: #999;
+            font-size: 0.85rem;
+        }
+        .review-comment {
+            color: #333;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+        .review-helpful {
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .helpful-btn {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .helpful-btn:hover {
+            border-color: var(--accent-orange);
+            color: var(--accent-orange);
+        }
+        .no-reviews {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+    </style>
+    
+    <div class="reviews-container">
+        <h3 style="margin-bottom: 25px; color: var(--primary-blue); font-weight: 700;">
+            <i class="fa fa-star mr-2"></i>Customer Reviews
+        </h3>
+        
+        <!-- Rating Summary -->
+        <div class="rating-summary" id="ratingSummary" style="display: none;">
+            <div class="rating-score">
+                <div class="rating-number" id="avgRating">0.0</div>
+                <div class="rating-stars" id="avgStars"></div>
+                <div class="rating-count" id="totalReviews">0 reviews</div>
+            </div>
+            <div class="rating-breakdown">
+                <div class="rating-bar-row">
+                    <span class="rating-bar-label">5 stars</span>
+                    <div class="rating-bar-bg">
+                        <div class="rating-bar-fill" id="bar5" style="width: 0%"></div>
+                    </div>
+                    <span class="rating-bar-count" id="count5">0</span>
+                </div>
+                <div class="rating-bar-row">
+                    <span class="rating-bar-label">4 stars</span>
+                    <div class="rating-bar-bg">
+                        <div class="rating-bar-fill" id="bar4" style="width: 0%"></div>
+                    </div>
+                    <span class="rating-bar-count" id="count4">0</span>
+                </div>
+                <div class="rating-bar-row">
+                    <span class="rating-bar-label">3 stars</span>
+                    <div class="rating-bar-bg">
+                        <div class="rating-bar-fill" id="bar3" style="width: 0%"></div>
+                    </div>
+                    <span class="rating-bar-count" id="count3">0</span>
+                </div>
+                <div class="rating-bar-row">
+                    <span class="rating-bar-label">2 stars</span>
+                    <div class="rating-bar-bg">
+                        <div class="rating-bar-fill" id="bar2" style="width: 0%"></div>
+                    </div>
+                    <span class="rating-bar-count" id="count2">0</span>
+                </div>
+                <div class="rating-bar-row">
+                    <span class="rating-bar-label">1 star</span>
+                    <div class="rating-bar-bg">
+                        <div class="rating-bar-fill" id="bar1" style="width: 0%"></div>
+                    </div>
+                    <span class="rating-bar-count" id="count1">0</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Review Submission Form (shown only to authenticated users who rented the vehicle) -->
+        <div class="review-form" id="reviewForm" style="display: none;">
+            <h5 style="margin-bottom: 15px; color: var(--primary-blue);">Write a Review</h5>
+            <div class="star-rating" id="starRating">
+                <i class="far fa-star" data-rating="1"></i>
+                <i class="far fa-star" data-rating="2"></i>
+                <i class="far fa-star" data-rating="3"></i>
+                <i class="far fa-star" data-rating="4"></i>
+                <i class="far fa-star" data-rating="5"></i>
+            </div>
+            <textarea class="review-textarea" id="reviewComment" placeholder="Share your experience with this vehicle..."></textarea>
+            <button class="submit-review-btn" onclick="submitReview()">
+                <i class="fa fa-paper-plane mr-2"></i>Submit Review
+            </button>
+        </div>
+        
+        <!-- Reviews List -->
+        <div id="reviewsList">
+            <div class="no-reviews">
+                <i class="fa fa-comment-slash fa-3x mb-3" style="color: #ddd;"></i>
+                <p>No reviews yet. Be the first to review this vehicle!</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedRating = 0;
+let currentVehicleId = null;
+
+// Initialize star rating
+document.querySelectorAll('#starRating i').forEach(star => {
+    star.addEventListener('click', function() {
+        selectedRating = parseInt(this.dataset.rating);
+        updateStarDisplay(selectedRating);
+    });
+    
+    star.addEventListener('mouseenter', function() {
+        updateStarDisplay(parseInt(this.dataset.rating));
+    });
+});
+
+document.getElementById('starRating').addEventListener('mouseleave', function() {
+    updateStarDisplay(selectedRating);
+});
+
+function updateStarDisplay(rating) {
+    document.querySelectorAll('#starRating i').forEach((star, index) => {
+        if (index < rating) {
+            star.classList.remove('far');
+            star.classList.add('fas', 'active');
+        } else {
+            star.classList.remove('fas', 'active');
+            star.classList.add('far');
+        }
+    });
+}
+
+// Load reviews for a vehicle
+async function loadReviews(vehicleId) {
+    currentVehicleId = vehicleId;
+    
+    try {
+        const response = await fetch(`/api/reviews/vehicle/${vehicleId}`);
+        const data = await response.json();
+        
+        if (data.statistics && data.statistics.totalReviews > 0) {
+            displayRatingSummary(data.statistics);
+            displayReviews(data.reviews);
+        } else {
+            document.getElementById('ratingSummary').style.display = 'none';
+            document.getElementById('reviewsList').innerHTML = `
+                <div class="no-reviews">
+                    <i class="fa fa-comment-slash fa-3x mb-3" style="color: #ddd;"></i>
+                    <p>No reviews yet. Be the first to review this vehicle!</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading reviews:', error);
+    }
+}
+
+function displayRatingSummary(stats) {
+    document.getElementById('ratingSummary').style.display = 'flex';
+    document.getElementById('avgRating').textContent = stats.averageRating.toFixed(1);
+    document.getElementById('avgStars').innerHTML = generateStars(stats.averageRating);
+    document.getElementById('totalReviews').textContent = `${stats.totalReviews} review${stats.totalReviews !== 1 ? 's' : ''}`;
+    
+    const total = stats.totalReviews;
+    document.getElementById('count5').textContent = stats.fiveStars;
+    document.getElementById('count4').textContent = stats.fourStars;
+    document.getElementById('count3').textContent = stats.threeStars;
+    document.getElementById('count2').textContent = stats.twoStars;
+    document.getElementById('count1').textContent = stats.oneStar;
+    
+    document.getElementById('bar5').style.width = `${(stats.fiveStars / total) * 100}%`;
+    document.getElementById('bar4').style.width = `${(stats.fourStars / total) * 100}%`;
+    document.getElementById('bar3').style.width = `${(stats.threeStars / total) * 100}%`;
+    document.getElementById('bar2').style.width = `${(stats.twoStars / total) * 100}%`;
+    document.getElementById('bar1').style.width = `${(stats.oneStar / total) * 100}%`;
+}
+
+function displayReviews(reviews) {
+    if (reviews.length === 0) return;
+    
+    const reviewsList = document.getElementById('reviewsList');
+    reviewsList.innerHTML = reviews.map(review => `
+        <div class="review-item">
+            <div class="review-header">
+                <div>
+                    <span class="review-user"><i class="fa fa-user-circle mr-1"></i>${escapeHtml(review.user.username)}</span>
+                    <span class="review-rating ml-3">${generateStars(review.rating)}</span>
+                </div>
+                <span class="review-date">${formatDate(review.createdDate)}</span>
+            </div>
+            <div class="review-comment">${escapeHtml(review.comment || 'No comment provided.')}</div>
+            <div class="review-helpful">
+                <button class="helpful-btn" onclick="markHelpful(${review.id})">
+                    <i class="far fa-thumbs-up mr-1"></i>Helpful (${review.helpfulCount || 0})
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function generateStars(rating) {
+    const fullStars = Math.floor(rating);
+    const hasHalfStar = rating % 1 >= 0.5;
+    let stars = '';
+    
+    for (let i = 0; i < fullStars; i++) {
+        stars += '<i class="fas fa-star"></i>';
+    }
+    if (hasHalfStar) {
+        stars += '<i class="fas fa-star-half-alt"></i>';
+    }
+    const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+    for (let i = 0; i < emptyStars; i++) {
+        stars += '<i class="far fa-star"></i>';
+    }
+    return stars;
+}
+
+async function submitReview() {
+    if (selectedRating === 0) {
+        alert('Please select a rating');
+        return;
+    }
+    
+    const comment = document.getElementById('reviewComment').value.trim();
+    
+    try {
+        const response = await fetch('/api/reviews', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                vehicleId: currentVehicleId,
+                rating: selectedRating,
+                comment: comment
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            alert('Review submitted successfully!');
+            selectedRating = 0;
+            document.getElementById('reviewComment').value = '';
+            updateStarDisplay(0);
+            loadReviews(currentVehicleId);
+            document.getElementById('reviewForm').style.display = 'none';
+        } else {
+            alert(result.message || 'Failed to submit review');
+        }
+    } catch (error) {
+        console.error('Error submitting review:', error);
+        alert('An error occurred while submitting your review');
+    }
+}
+
+async function markHelpful(reviewId) {
+    try {
+        await fetch(`/api/reviews/${reviewId}/helpful`, {
+            method: 'POST'
+        });
+        loadReviews(currentVehicleId);
+    } catch (error) {
+        console.error('Error marking review as helpful:', error);
+    }
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+    return date.toLocaleDateString();
+}
+
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+</script>

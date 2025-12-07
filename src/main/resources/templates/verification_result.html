@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Email Verification - DriveEase</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-blue: #0b3d91;
+            --accent-orange: #ff7b00;
+            --gradient-start: #1e3c72;
+            --gradient-end: #2a5298;
+        }
+        body {
+            background: linear-gradient(135deg, #e7f1ff, #ffffff);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-container {
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 50px;
+            text-align: center;
+            animation: fadeIn 0.7s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+        .icon-success {
+            font-size: 80px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        .icon-error {
+            font-size: 80px;
+            color: #dc3545;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: var(--primary-blue);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .btn-primary {
+            background-color: var(--accent-orange);
+            border: none;
+            padding: 12px 40px;
+            border-radius: 50px;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(255, 123, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+        .btn-primary:hover {
+            background-color: #ff6500;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 123, 0, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="result-container">
+        <div th:if="${success}">
+            <div class="icon-success">
+                <i class="fa fa-check-circle"></i>
+            </div>
+            <h1>Email Verified!</h1>
+            <p th:text="${message}">Your email has been successfully verified!</p>
+            <a href="/login" class="btn btn-primary">Login to Your Account</a>
+        </div>
+        
+        <div th:unless="${success}">
+            <div class="icon-error">
+                <i class="fa fa-times-circle"></i>
+            </div>
+            <h1>Verification Failed</h1>
+            <p th:text="${message}">Invalid or expired verification link.</p>
+            <a href="/resend-verification" class="btn btn-primary">Resend Verification Email</a>
+        </div>
+    </div>
+</body>
+</html>

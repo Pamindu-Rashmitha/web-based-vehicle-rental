@@ -229,6 +229,9 @@
         <a class="btn btn-nav" href="/user/dashboard"><i class="fa fa-tachometer-alt"></i> Dashboard</a>
         <a class="btn btn-nav" href="/browse"><i class="fa fa-car mr-1"></i>Browse Vehicles</a>
         <a class="btn btn-nav" href="/support"><i class="fa fa-headset mr-1"></i>Support</a>
+        <form th:action="@{/logout}" method="post" class="d-inline">
+            <button type="submit" class="btn btn-logout"><i class="fa fa-sign-out-alt mr-1"></i>Logout</button>
+        </form>
     </div>
 </nav>
 
@@ -255,10 +258,6 @@
     </form>
     <form th:action="@{/delete-account}" method="post" onsubmit="return confirmDelete()">
         <button type="submit" class="delete-btn">Delete Account</button>
-    </form>
-
-    <form th:action="@{/logout}" method="post" aria-label="Logout form">
-        <button type="submit" class="logout-button"><i class="fa fa-sign-out-alt"></i> Logout</button>
     </form>
 
     <p>Need help? <a th:href="@{/privacy}">View Privacy Policy</a></p>

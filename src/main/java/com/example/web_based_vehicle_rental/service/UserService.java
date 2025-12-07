@@ -16,12 +16,14 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final ReservationRepository reservationRepository;
+    private final VerificationService verificationService;
 
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
-            ReservationRepository reservationRepository) {
+            ReservationRepository reservationRepository, VerificationService verificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.reservationRepository = reservationRepository;
+        this.verificationService = verificationService;
     }
 
     public void register(User user) {
@@ -42,9 +44,13 @@ public class UserService {
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-
         user.setRole("USER");
-        userRepository.save(user);
+        user.setEmailVerified(false); // Ensure email is not verified by default
+
+        User savedUser = userRepository.save(user);
+
+        // Send verification email
+        verificationService.createVerificationToken(savedUser);
     }
 
     public void updateProfile(String currentUsername, User updatedUser) {
